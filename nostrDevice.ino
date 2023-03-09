@@ -15,17 +15,10 @@ int portalPin = 4;
 
 // Access point variables
 String payloadStr;
-String password;
-String serverFull;
-String lnbitsServer;
-String ssid;
-String wifiPassword;
-String deviceId;
-String highPin;
 String timePin;
 String pinFlip;
 String dataId;
-String lnurl;
+String privatekey;
 
 bool paid;
 bool down = false;
@@ -76,44 +69,13 @@ void setup()
 }
 
 void loop() {
-  while(WiFi.status() != WL_CONNECTED){
-    Serial.println("Failed to connect");
-    delay(500);
-  }
-  digitalWrite(2, LOW);
-  paid = false;
-  while(paid == false){
-    webSocket.loop();
-    if(paid){
-      Serial.println(payloadStr);
-      highPin = getValue(payloadStr, '-', 0);
-      Serial.println(highPin);
-      timePin = getValue(payloadStr, '-', 1);
-      Serial.println(timePin);
-      onOff();
-    }
-  }
-  Serial.println("Paid");
+
+  // Wait for an event to sign
+
 }
 
 //////////////////HELPERS///////////////////
 
-void onOff()
-{ 
-  pinMode (highPin.toInt(), OUTPUT);
-  if(pinFlip == "true"){
-    digitalWrite(highPin.toInt(), LOW);
-    delay(timePin.toInt());
-    digitalWrite(highPin.toInt(), HIGH); 
-    delay(2000);
-  }
-  else{
-    digitalWrite(highPin.toInt(), HIGH);
-    delay(timePin.toInt());
-    digitalWrite(highPin.toInt(), LOW); 
-    delay(2000);
-  }
-}
 
 String getValue(String data, char separator, int index)
 {
@@ -136,34 +98,14 @@ void readFiles()
   File paramFile = FlashFS.open(PARAM_FILE, "r");
   if (paramFile)
   {
-    StaticJsonDocument<1500> doc;
+    StaticJsonDocument<500> doc;
     DeserializationError error = deserializeJson(doc, paramFile.readString());
 
     const JsonObject maRoot0 = doc[0];
     const char *maRoot0Char = maRoot0["value"];
-    password = maRoot0Char;
-    Serial.println(password);
+    privatekey = maRoot0Char;
+    Serial.println(privatekey);
 
-    const JsonObject maRoot1 = doc[1];
-    const char *maRoot1Char = maRoot1["value"];
-    ssid = maRoot1Char;
-    Serial.println(ssid);
-
-    const JsonObject maRoot2 = doc[2];
-    const char *maRoot2Char = maRoot2["value"];
-    wifiPassword = maRoot2Char;
-    Serial.println(wifiPassword);
-
-    const JsonObject maRoot3 = doc[3];
-    const char *maRoot3Char = maRoot3["value"];
-    serverFull = maRoot3Char;
-    lnbitsServer = serverFull.substring(5, serverFull.length() - 33);
-    deviceId = serverFull.substring(serverFull.length() - 22);
-
-    const JsonObject maRoot4 = doc[4];
-    const char *maRoot4Char = maRoot4["value"];
-    lnurl = maRoot4Char;
-    Serial.println(lnurl);
   }
   paramFile.close();
 }
