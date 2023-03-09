@@ -2,7 +2,6 @@
 #include <FS.h>
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
-#include <WebSocketsClient.h>
 
 fs::SPIFFSFS &FlashFS = SPIFFS;
 #define FORMAT_ON_FAIL true
@@ -51,7 +50,7 @@ void setup()
     digitalWrite(2, LOW);
     Serial.println(touchRead(portalPin));
     if(touchRead(portalPin) < 40){
-      Serial.println("Launch portal");
+      Serial.println("Launch config");
       triggerConfig = true;
       timer = 5000;
     }
@@ -68,33 +67,12 @@ void setup()
   // get the saved details and store in global variables
   readFiles();
 
-  if (triggerConfig == false){
-    WiFi.begin(ssid.c_str(), wifiPassword.c_str());
-    while (WiFi.status() != WL_CONNECTED && timer < 20000) {
-      delay(500);
-      digitalWrite(2, HIGH);
-      Serial.print(".");
-      timer = timer + 1000;
-      if(timer > 19000){
-        triggerConfig = true;
-      }
-      delay(500);
-      digitalWrite(2, LOW);
-    }
-  }
-
   if (triggerConfig == true)
   {
     digitalWrite(2, HIGH);
     Serial.println("USB Config triggered");
     configOverSerialPort();
   }
-
-  pinMode(highPin.toInt(), OUTPUT);
-  onOff();
-  Serial.println(lnbitsServer + "/api/v1/ws/" + deviceId);
-  webSocket.beginSSL(lnbitsServer, 443, "/api/v1/ws/" + deviceId);
-  webSocket.onEvent(webSocketEvent);
 }
 
 void loop() {
@@ -188,44 +166,4 @@ void readFiles()
     Serial.println(lnurl);
   }
   paramFile.close();
-}
-
-//////////////////NODE CALLS///////////////////
-
-void checkConnection(){
-  WiFiClientSecure client;
-  client.setInsecure();
-  const char* lnbitsserver = lnbitsServer.c_str();
-  if (!client.connect(lnbitsserver, 443)){
-    down = true;
-    return;   
-  }
-}
-
-//////////////////WEBSOCKET///////////////////
-
-void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
-    switch(type) {
-        case WStype_DISCONNECTED:
-            Serial.printf("[WSc] Disconnected!\n");
-            break;
-        case WStype_CONNECTED:
-            {
-                Serial.printf("[WSc] Connected to url: %s\n",  payload);
-                
-
-			    // send message to server when Connected
-				webSocket.sendTXT("Connected");
-            }
-            break;
-        case WStype_TEXT:
-            payloadStr = (char*)payload;
-            paid = true;
-		case WStype_ERROR:			
-		case WStype_FRAGMENT_TEXT_START:
-		case WStype_FRAGMENT_BIN_START:
-		case WStype_FRAGMENT:
-		case WStype_FRAGMENT_FIN:
-			break;
-    }
 }
