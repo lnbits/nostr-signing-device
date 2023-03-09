@@ -1,7 +1,7 @@
 {
-  "name": "LNbits HWW",
+  "name": "LNbits bitcoinSwitch",
   "version": "0.1",
-  "funding_url": "https://github.com/lnbits/hardware-wallet",
+  "funding_url": "https://github.com/lnbits/bitcoinswitch",
   "new_install_prompt_erase": true,
   "builds": [
     {
