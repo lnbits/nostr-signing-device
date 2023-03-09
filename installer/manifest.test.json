@@ -1,0 +1,17 @@
+{
+  "name": "LNbits HWW",
+  "version": "0.1",
+  "funding_url": "https://github.com/lnbits/hardware-wallet",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        { "path": "firmware/v0.1/bootloader.bin", "offset": 4096 },
+        { "path": "firmware/v0.1/wallet.ino.partitions.bin", "offset": 32768 },
+        { "path": "firmware/v0.1/boot_app0.bin", "offset": 57344 },
+        { "path": "firmware/v0.1/wallet.ino.bin ", "offset": 65536 }
+      ]
+    }
+  ]
+}

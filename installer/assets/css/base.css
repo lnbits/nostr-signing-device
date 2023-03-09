@@ -1,0 +1,12 @@
+.device_img {
+    border: 2px solid #555;
+    border-radius: 20%;
+}
+
+.text_green {
+    color: green;
+}
+
+.text_red {
+    color: red;
+}
