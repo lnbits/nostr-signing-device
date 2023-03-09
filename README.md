@@ -1,23 +1,19 @@
-# DIY Bitcoin Hardware Wallet (powered by <a href="https://www.arduino.cc/reference/en/libraries/ubitcoin/">uBitcoin</a>)
-## This HWW is in BETA, use with TESTNET only, or with an amount of funds you are willing to lose 
+# DIY Nostr signing devie (powered by <a href="https://www.arduino.cc/reference/en/libraries/ubitcoin/">uBitcoin</a>)
 
-## Use a world of microcontrollers to contruct your own bitcoin hardware wallet
+## Flash here https://lnbits.github.io/nostr-device
 
+<img style="width:500px;" src="https://i.imgur.com/wlV5isa.png">
 
-## Flash here https://lnbits.github.io/hardware-wallet
+For use with https://github.com/fiatjaf/nos2x.
 
-<img style="width:500px;" src="https://user-images.githubusercontent.com/33088785/180316957-4f99d7e9-9820-4302-9dde-ba555cb04729.png">
+Join us <a href="https://t.me/nostr_protocol">t.me/nostr_protocol</a>, <a href="https://t.me/lnbits">t.me/lnbits</a>, <a href="https://t.me/makerbits">t.me/makerbits</a>
 
-For use with LNbits Legend OnchainWallet extension, but can other wallet applications can easily be built
+This very cheap off the shelf nostr signing device is designed to work with Lilygos <a href="https://www.aliexpress.com/item/33048962331.html">Tdisplay</a>, but you can easily make work with any ESP32.
 
-Join us <a href="https://t.me/lnbits">t.me/lnbits</a>, <a href="https://t.me/makerbits">t.me/makerbits</a>
-
-This very cheap off the shelf hardware wallet is designed to work with Lilygos <a href="https://www.aliexpress.com/item/33048962331.html">Tdisplay</a>, but you can easily make work with any ESP32.
-
-Data is sent to/from the **Hardware Wallet** over webdev Serial, not the most secure data transmission method, but fine for handling small-medium sized amounts of funds. You can use LNbits OnchainWallet extension, or any other serial monitor.
+Data is sent to/from the **Signing Device** over webdev Serial, not the most secure data transmission method, but x1000 better than storing the privatekey on a computer. Clients could support sending to the device directly, but using is Nos2X is far more convenient.
 
 ## Install instructions
-- Flash the hardware-wallet firmware directly from the browser using the [installer](https://lnbits.github.io/hardware-wallet)
+- Flash the hardware-wallet firmware directly from the browser using the [installer](https://lnbits.github.io/nostr-device)
 ## Build instructions
 
 - Buy a Lilygo <a href="https://www.aliexpress.com/item/33048962331.html">Tdisplay</a> (although with a little tinkering any ESP32 will do) 
