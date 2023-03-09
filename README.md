@@ -1,4 +1,4 @@
-# DIY Nostr signing devie (powered by <a href="https://www.arduino.cc/reference/en/libraries/ubitcoin/">uBitcoin</a>)
+# DIY Nostr signing device (powered by <a href="https://www.arduino.cc/reference/en/libraries/ubitcoin/">uBitcoin</a>)
 
 ## Flash here https://lnbits.github.io/nostr-device
 
