@@ -2,6 +2,10 @@
 const configText = document.getElementById('config-file-text');
 let configFormat = ''
 
+function clearConfigUI() {
+    document.getElementById('private-key').value = ''
+}
+
 function updateConfigUI(data) {
     configText.value = data
     updateConfigFormat(data)

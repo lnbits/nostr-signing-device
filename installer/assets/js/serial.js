@@ -128,7 +128,9 @@ const readFromSerialPort = reader => {
 }
 
 function handleSerialPortResponse(command, data = '') {
+
     if (command === '/restore') {
+        clearConfigUI()
         showMessage('Private key saved!')
         serialConfig.data = ''
     }
