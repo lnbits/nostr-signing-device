@@ -19,25 +19,6 @@ function updateConfigFormat(data) {
     }
 }
 
-if (window.FileList && window.File) {
-    document.getElementById('config-file-selector').addEventListener('change', event => {
-        configText.innerHTML = '';
-        for (const file of event.target.files) {
-            const configFilePath = document.getElementById('config-file-path');
-            configFilePath.value = configFilePath.value || file.name || ""
-
-
-            let reader = new FileReader()
-            reader.readAsText(file, "UTF-8");
-
-            reader.onload = function (evt) {
-                updateConfigUI(evt.target.result)
-            }
-        }
-    });
-
-}
-
 function updateInputFields(data) {
     if (configFormat === 'json') {
         return updateInputFieldsFromJson(data)
@@ -141,9 +122,6 @@ function refreshTextConfig() {
 }
 
 function onToggleConfig(cb) {
-    if (cb.checked) {
-        showMessage("To enter config mode: reboot the device holding boot pin'")
-    }
     const configDivs = document.getElementsByClassName("bitcoinswitch-config-div");
     Array.from(configDivs).forEach(div => {
         if (cb.checked) {
