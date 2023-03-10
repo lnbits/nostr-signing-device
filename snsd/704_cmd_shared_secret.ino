@@ -37,7 +37,7 @@ CommandResponse executeSharedSecret(String publicKeyHex) {
 
   // logInfo("xxxx: " + toHex(dhPublicKey.point, sizeof(dhPublicKey.point)));
   // todo: wait for button click
-  delay(10000);
+
 
   return {"Shared Secret", "done"};
 }

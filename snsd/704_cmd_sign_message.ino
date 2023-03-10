@@ -15,7 +15,6 @@ CommandResponse executeSignMessage(String messageHex) {
   byte privateKeyBytes[byteSize];
   fromHex(privateKeyHex, privateKeyBytes, byteSize);
   PrivateKey privateKey(privateKeyBytes);
-  logInfo("privateKey address: " + privateKey.address());
 
 
   byte messageBytes[byteSize];
@@ -28,7 +27,6 @@ CommandResponse executeSignMessage(String messageHex) {
 
   // todo: wait for button click
   showMessage("Signed Message", signatureHex.substring(0, 16) + "...");
-  delay(10000);
 
   return {"Signed Message", signatureHex.substring(0, 16) + "..."};
 }
