@@ -9,7 +9,9 @@ CommandResponse executeSharedSecret(String publicKeyHex) {
   // python: #### shared_secret ca0653175f9069b104c5d929866a7cccd4002c7a9a21e1cb053a42fd311fb2db
   // arduimo: bbe91483b639859885ccbd67aa307a21dea00cc075618be118e3416b407444a2
   logInfo("executeSharedSecret!! 100");
-  String privateKeyHex = "4c89c4e0db793a7fac4881f7b6f209ab2c039d88ca64600537f3a94e855478ab";
+  FileData nostrFile = readFile(SPIFFS, global.nostrFileName.c_str());
+  // todo: check success
+  String privateKeyHex = nostrFile.data;
   int byteSize =  32;
   byte privateKeyBytes[byteSize];
   fromHex(privateKeyHex, privateKeyBytes, byteSize);

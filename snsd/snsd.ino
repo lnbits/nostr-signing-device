@@ -60,6 +60,7 @@ struct GlobalState {
   unsigned long startTime;
   const String passwordFileName;
   const String mnemonicFileName;
+  const String nostrFileName;
   const String sharedSecretFileName;
   const String deviceMetaFileName;
   int button1Pin;
@@ -84,6 +85,7 @@ GlobalState global = {
   millis(),
   "/hash.txt",
   "/mn.txt",
+  "/nostr-secret.txt",
   "/shared_secret.txt",
   "/device_meta.txt",
   button1PinNumber,

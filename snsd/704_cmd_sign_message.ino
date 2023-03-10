@@ -9,7 +9,8 @@ CommandResponse executeSignMessage(String messageHex) {
 
   logInfo("Preparing to sign messsge: " + messageHex);
 
-  String privateKeyHex = "4c89c4e0db793a7fac4881f7b6f209ab2c039d88ca64600537f3a94e855478ab";
+  FileData nostrFile = readFile(SPIFFS, global.nostrFileName.c_str()); // todo: check success
+  String privateKeyHex = nostrFile.data;
   int byteSize =  32;
   byte privateKeyBytes[byteSize];
   fromHex(privateKeyHex, privateKeyBytes, byteSize);

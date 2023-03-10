@@ -7,6 +7,9 @@
 CommandResponse executePing(String data) {
   if (data == "") return {"", ""};
   
+  FileData nostrFile = readFile(SPIFFS, global.nostrFileName.c_str());
+  Serial.println("nostrFile: " + nostrFile.data);
+
   Serial.println(COMMAND_PING + " 0 " + global.deviceId);
   return {"Contacted by", data};
 }

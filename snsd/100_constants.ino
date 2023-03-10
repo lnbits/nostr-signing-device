@@ -4,6 +4,7 @@ const String PAIRING_CONTROL_TEXT = "lnbits";
 
 const String COMMAND_HELP = "/help";
 const String COMMAND_PING = "/ping";
+const String COMMAND_RESTORE = "/restore";
 const String COMMAND_PUBLIC_KEY = "/public-key";
 const String COMMAND_SEED = "/seed";
 const String COMMAND_SIGN_MESSAGE = "/sign-message";
