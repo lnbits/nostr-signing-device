@@ -1,7 +1,7 @@
 {
-  "name": "LNbits bitcoinSwitch",
+  "name": "Nostr Signing Device",
   "version": "0.1",
-  "funding_url": "https://github.com/lnbits/bitcoinswitch",
+  "funding_url": "https://github.com/lnbits/nostr-signing-device",
   "new_install_prompt_erase": true,
   "builds": [
     {
@@ -12,7 +12,7 @@
           "offset": 4096
         },
         {
-          "path": "firmware/esp32/v0.1/bitcoinSwitch.ino.partitions.bin",
+          "path": "firmware/esp32/v0.1/snsd.ino.partitions.bin",
           "offset": 32768
         },
         {
@@ -20,7 +20,7 @@
           "offset": 57344
         },
         {
-          "path": "firmware/esp32/v0.1/bitcoinSwitch.ino.bin",
+          "path": "firmware/esp32/v0.1/snsd.ino.bin",
           "offset": 65536
         }
       ]
