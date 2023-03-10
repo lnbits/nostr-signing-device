@@ -68,7 +68,7 @@
                         </div>
 
                         <div class="navbar-btn d-none d-sm-inline-block">
-                            <a href="https://github.com/lnbits/bitcoinSwitch#bitcoinswitch" rel="nofollow noopener"
+                            <a href="https://github.com/lnbits/nostr-signing-device" rel="nofollow noopener"
                                 class="ud-main-btn ud-white-btn">
                                 Github
                             </a>
@@ -172,11 +172,11 @@
                                     <div class="row">
                                         <div class="col-12">
 
-                                            <div id="config-file-text-group">
+                                            <div id="private-key-group">
                                                 <div class="ud-form-group">
-                                                    <label for="config-file-text">Private Key</label>
-                                                    <input name="config-file-text" id="config-file-text" type="password"
-                                                        placeholder="Enter your 'hex' or 'nsec' private key"
+                                                    <label for="private-key">Private Key</label>
+                                                    <input name="private-key" id="private-key" type="password"
+                                                        placeholder="Enter your 'hex' private key"
                                                         style="border-top: 2px solid #f1f1f1;"></input>
                                                 </div>
                                             </div>
@@ -184,12 +184,6 @@
                                     </div>
                                     <div class="row ud-hero-buttons">
                                         <div class="col-3 mt-3">
-                                            <label class="switch">
-                                                <input id="display-mode" onclick="onDisplayModeChamge()"
-                                                    type="checkbox">
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <label class="ud-feature-title">Show Private Key</label>
                                         </div>
                                         <div class="col-9"></div>
                                     </div>
@@ -342,7 +336,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">bitcoinSwitch</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Nostr Signing Device</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -417,16 +411,6 @@
         window.document.addEventListener("scroll", onScroll);
     </script>
 
-    <script>
-
-
-
-
-
-
-
-
-    </script>
 </body>
 
 </html>
