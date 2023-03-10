@@ -24,8 +24,7 @@
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://github.com/lnbits/bitcoinswitch" />
     <meta property="twitter:title" content="LNBits - Nostr Signing Device" />
-    <meta property="twitter:description"
-        content="LNBits - Nostr Signing Device" />
+    <meta property="twitter:description" content="LNBits - Nostr Signing Device" />
     <meta property="twitter:image" content="https://i.imgur.com/0lakiYN.png" />
 
     <!--====== Favicon Icon ======-->
@@ -89,14 +88,16 @@
                 <div class="col-lg-12">
                     <div class="ud-hero-content wow fadeInUp" data-wow-delay=".2s">
                         <h1 class="ud-hero-title">
-                            Nostr Signing Device<br/>Sign notes securely 🔒
-                            <br/><small style="font-size:20px">Created using <a href="https://github.com/micro-bitcoin/uBitcoin">ubitcoin</a>, for use with <a href="https://github.com/fiatjaf/nos2x">Nos2x</a></small>
+                            Nostr Signing Device<br />Sign notes securely 🔒
+                            <br /><small style="font-size:20px">Created using <a
+                                    href="https://github.com/micro-bitcoin/uBitcoin">ubitcoin</a>, for use with <a
+                                    href="https://github.com/fiatjaf/nos2x">Nos2x</a></small>
                         </h1>
                         <center>
                             <div style="max-width: 700px" class="row ud-hero-buttons">
                                 <div class="col-2">
-                                    <a href="https://github.com/lnbits/nostr-signing-device#nostr-signing-device" rel="nofollow noopener"
-                                        class="ud-main-btn ud-white-btn">
+                                    <a href="https://github.com/lnbits/nostr-signing-device#nostr-signing-device"
+                                        rel="nofollow noopener" class="ud-main-btn ud-white-btn">
                                         Github
                                     </a>
                                 </div>
@@ -107,7 +108,7 @@
                                     </select>
 
                                 </div>
-                                <div class="col-4">Stable Version
+                                <div class="col-4">
                                     <esp-web-install-button id="espInstallButton"
                                         manifest="./firmware/esp32/v0.1/manifest.json">
                                         <button slot="activate" class="ud-main-btn ud-white-btn" data-toggle="tooltip"
@@ -134,12 +135,13 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="row mb-3 mt-3 ud-hero-buttons">
+
+                        <div class="row ud-hero-buttons bitcoinswitch-config-div d-none">
                             <div class="col-4">
                                 <div class="ud-login-form float-end bitcoinswitch-config-div d-none">
                                     <div class="ud-form-group">
                                         <label for="baud-rate">Baud Rate:</label>
-                                        <input type="number" name="baud-rate" id="baud-rate" value="115200"
+                                        <input type="number" name="baud-rate" id="baud-rate" value="9600"
                                             placeholder="Baud Rate" />
                                     </div>
                                 </div>
@@ -148,22 +150,8 @@
                                 <input type="button" value="Connect" onclick="connectToDevice(this)"
                                     class="ud-main-btn ud-white-btn float-end  bitcoinswitch-config-div d-none" />
                             </div>
-                        </div>
-                        <hr class="mt-2 mb-3 bitcoinswitch-config-div d-none" />
 
-                        <div class="row ud-hero-buttons bitcoinswitch-config-div d-none">
-                            <div class="col-5">
-                                <div class="ud-login-form">
-                                    <div class="ud-form-group">
-                                        <label for="config-file-path">Config File Path (on device):</label>
-                                        <input style="background-color: lightgrey;" type="text" name="config-file-path" id="config-file-path"
-                                            placeholder="Config File Path (on device)" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <input type="button" value="Download from Device" onclick="downloadFromDevice(this)"
-                                    class="ud-main-btn ud-white-btn" />
+                            <div class="col-2">
 
                             </div>
                             <div class="col-1"></div>
@@ -181,6 +169,19 @@
                             <div class="col-12">
 
                                 <div class="ud-contact-form-wrapper">
+                                    <div class="row">
+                                        <div class="col-12">
+
+                                            <div id="config-file-text-group">
+                                                <div class="ud-form-group">
+                                                    <label for="config-file-text">Private Key</label>
+                                                    <input name="config-file-text" id="config-file-text" type="password"
+                                                        placeholder="Enter your 'hex' or 'nsec' private key"
+                                                        style="border-top: 2px solid #f1f1f1;"></input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="row ud-hero-buttons">
                                         <div class="col-3 mt-3">
                                             <label class="switch">
@@ -188,52 +189,9 @@
                                                     type="checkbox">
                                                 <span class="slider round"></span>
                                             </label>
-                                            <label class="ud-feature-title">Text Mode</label>
+                                            <label class="ud-feature-title">Show Private Key</label>
                                         </div>
-                                        <div class="col-3">
-                                            <select onchange="updateTemplate(this)" class="ud-main-btn">
-                                                <option value="" disabled selected>Select Template</option>
-                                                <option value="elements">Nostr Signing Device Config</option>
-                                                <!-- <option value="beskomat">Beskomat Config</option> -->
-                                            </select>
-                                        </div>
-                                        <div class="col-2"></div>
-                                        <div class="col-4">
-                                            <button onclick="document.getElementById('config-file-selector').click();"
-                                                class="ud-main-btn float-end">
-                                                Upload Config File
-                                            </button>
-                                            <input type="file" id="config-file-selector" style="display:none;"
-                                                class="ud-main-btn ud-white-btn" />
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div id="config-file-fields-group">
-                                                <br /><br />
-                                                <h3 class="ud-feature-title">No Config Data</h3>
-
-                                                <ul>
-                                                    <li>
-                                                        Upload a <code>.properties</code>' or <code>.json</code> file
-                                                    </li>
-                                                    <li>
-                                                        Or switch to 'Text Content Mode' to add new properties
-                                                    </li>
-                                                </ul>
-
-                                            </div>
-
-                                            <div id="config-file-text-group" style="display:none">
-                                                <div class="ud-form-group">
-                                                    <label for="config-file-text">Config File Text Content</label>
-                                                    <textarea name="config-file-text" id="config-file-text" rows="15"
-                                                        cols="200" placeholder="Add a new entry of the form 'key=value'"
-                                                        style="border-top: 2px solid #f1f1f1;"></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <div class="col-9"></div>
                                     </div>
                                 </div>
                             </div>
@@ -261,13 +219,13 @@
     <!-- ====== Features Start ====== -->
     <section id="features" class="ud-features">
         <div class="container">
-                        <h2>Installation and configuring</h2>
+            <h2>Installation and configuring</h2>
 
-                        <div class="ud-info-meta">
-                            <p>Use a compatible browser such as Chrome or Edge. Connect the Tdsiplay, click Flash, select Erase.</p>
-                            <p>Once flashed, to enable USB config mode press buttonn on startup.</p>
-                            <p>Connect to device, select `nostrDevice` template, add privatekey, `Save to device`.</p>
-                        </div>
+            <div class="ud-info-meta">
+                <p>Use a compatible browser such as Chrome or Edge. Connect the Tdsiplay, click Flash, select Erase.</p>
+                <p>Once flashed, to enable USB config mode press buttonn on startup.</p>
+                <p>Connect to device, select `nostrDevice` template, add privatekey, `Save to device`.</p>
+            </div>
         </div>
     </section>
     <!-- ====== Features End ====== -->
