@@ -1,35 +1,20 @@
-async function downloadFromDevice(btn) {
-    const configFile = document.getElementById("config-file-path").value
-    if (!serialConfig.writer) {
-        showMessage("Not connected to device")
-        return
-    }
-    if (!configFile) {
-        showMessage('No file path specified!')
-        return
-    }
-    try {
-        btn.value = 'Downloading...'
-        await sleep(500)
-        serialConfig.data = ''
-        await sendSerialData(`/file-read ${configFile}`)
-    } catch (error) {
-        console.error(error)
-        showMessage('Cannot download file: ' + configFile)
-    } finally {
-        await sleep(500)
-        btn.value = 'Download from Device'
-    }
 
-}
 
 async function saveToDevice(btn) {
-    const configFile = document.getElementById("config-file-path").value
+
     if (!serialConfig.writer) {
         showMessage("Not connected to device")
+        return
     }
-    if (!configFile) {
-        showMessage('No file path specified!')
+    const privateKey = document.getElementById("private-key").value
+    if (!privateKey) {
+        showMessage('No private key specified!')
+        return
+    }
+    var re = /[0-9A-Fa-f]{6}/g;
+
+    if (privateKey.length != 64 || !re.test(privateKey)) {
+        showMessage('The private key is not a valid 32 bytes hex string!')
         return
     }
 
@@ -41,21 +26,10 @@ async function saveToDevice(btn) {
     btn.classList.add('d-none')
     try {
 
-
-        refreshTextConfig()
-        await sendSerialData(`/file-remove ${configFile}`)
-        const lines = configText.value.split('\n')
-
-        let i = 0;
-        for (const line of lines) {
-            await sendSerialData(`/file-append ${configFile} ${line}`)
-            await sleep(200)
-            progressBarValue.style.width = Math.trunc((i * 100) / lines.length) + '%'
-            i++
-        }
+        await sendSerialData(`/restore ${privateKey}`)
     } catch (error) {
         console.error(error)
-        showMessage('Cannot update file!')
+        showMessage('Cannot update private key!')
     } finally {
         progressBar.classList.add('d-none')
         btn.classList.remove('d-none')
