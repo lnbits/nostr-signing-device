@@ -17,6 +17,8 @@ void setup() {
   if (loadFiles() == false)
     showMessage("Failed to open files",  "Reset or 'help'");
   updateDeviceConfig();
+
+  logo();
 }
 
 bool loadFiles() {

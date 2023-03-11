@@ -3,7 +3,6 @@ int button2State = HIGH;
 int lineNumber = 0;
 
 
-
 EventData awaitEvent() {
   if (global.hasCommandsFile == true) {
     return awaitFileEvent();
@@ -33,8 +32,12 @@ String getNextFileCommand() {
 }
 
 EventData awaitSerialEvent() {
-  logo();
+  unsigned long waitTime = millis();
   while (Serial.available() == 0) {
+    if  ((millis() - waitTime) > 60 * 1000) {
+      waitTime = millis();
+      logo();
+    }
     EventData buttonEvent = checkButtonsState();
     if (buttonEvent.type == EVENT_BUTTON_ACTION) return buttonEvent;
 
