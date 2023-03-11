@@ -2,7 +2,7 @@
 //================================COMMANDS================================//
 //========================================================================//
 
-CommandResponse cmdRes = {"Welcome", ""};
+CommandResponse cmdRes = {"Nostr", "Signing Device"};
 
 
 void listenForCommands() {
