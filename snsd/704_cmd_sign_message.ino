@@ -7,8 +7,6 @@
 CommandResponse executeSignMessage(String messageHex) {
   showMessage("Please wait", "Signing message...");
 
-  logInfo("Preparing to sign messsge: " + messageHex);
-
   FileData nostrFile = readFile(SPIFFS, global.nostrFileName.c_str()); // todo: check success
   String privateKeyHex = nostrFile.data;
   int byteSize =  32;
@@ -22,7 +20,6 @@ CommandResponse executeSignMessage(String messageHex) {
   SchnorrSignature signature = privateKey.schnorr_sign(messageBytes);
 
   String signatureHex = String(signature);
-  logInfo("Schnorr Signature: " + signatureHex);  
   sendCommandOutput(COMMAND_SIGN_MESSAGE, signatureHex);
 
   // todo: wait for button click

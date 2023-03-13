@@ -15,7 +15,6 @@ CommandResponse executeSharedSecret(String publicKeyHex) {
   byte privateKeyBytes[byteSize];
   fromHex(privateKeyHex, privateKeyBytes, byteSize);
   PrivateKey privateKey(privateKeyBytes);
-  PublicKey myPublicKey = privateKey.publicKey();
 
   byte sharedSecret[32];
 
@@ -25,7 +24,6 @@ CommandResponse executeSharedSecret(String publicKeyHex) {
   privateKey.ecdh(otherPublicKey, sharedSecret, false);
 
   String sharedSecretHex = toHex(sharedSecret, sizeof(sharedSecret));
-  logInfo("sharedSecretHex: " + sharedSecretHex);
   sendCommandOutput(COMMAND_SHARED_SECRET, sharedSecretHex);
 
   return {"Shared Secret", "sent..."};
