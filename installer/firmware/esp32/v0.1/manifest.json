@@ -8,19 +8,19 @@
       "chipFamily": "ESP32",
       "parts": [
         {
-          "path": "firmware/esp32/v0.1/bootloader.bin",
+          "path": "bootloader.bin",
           "offset": 4096
         },
         {
-          "path": "firmware/esp32/v0.1/snsd.ino.partitions.bin",
+          "path": "snsd.ino.partitions.bin",
           "offset": 32768
         },
         {
-          "path": "firmware/esp32/v0.1/boot_app0.bin",
+          "path": "boot_app0.bin",
           "offset": 57344
         },
         {
-          "path": "firmware/esp32/v0.1/snsd.ino.bin",
+          "path": "snsd.ino.bin",
           "offset": 65536
         }
       ]
