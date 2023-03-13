@@ -14,7 +14,7 @@ CommandResponse executePublicKey(String data) {
   PublicKey publicKey = privateKey.publicKey();
 
   String publicKeyHex = toHex(publicKey.point, sizeof(publicKey.point));
-  sendCommandOutput(COMMAND_PUBLIC_KEY, publicKeyHex);
+  sendCommandOutput(COMMAND_PUBLIC_KEY, publicKeyHex.substring(0, 64));
 
 
 
