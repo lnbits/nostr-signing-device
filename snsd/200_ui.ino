@@ -3,7 +3,7 @@
 //========================================================================//
 
 void logo() {
-  String title = "SNSD";
+  String title = "NSD";
   String subTitle = "Nostr Signing Device";
 
   tft.fillScreen(TFT_BLACK);
