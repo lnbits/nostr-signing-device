@@ -21,7 +21,7 @@ Data is sent to/from the **Signing Device** over webdev Serial, not the most sec
 - Install ESP32 boards, using <a href="https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html#installing-using-boards-manager">boards manager</a>
 - Download this repo
 - Copy these <a href="libraries">libraries</a> into your Arduino install "libraries" folder
-- Open this <a href="wallet/wallet.ino">wallet.ino</a> file in the Arduino IDE
+- Open this <a href="snsd/snsd.ino">snsd.ino</a> file in the Arduino IDE
 - Select "TTGO-LoRa32-OLED-V1" from tools>board
 - Upload to device
 
