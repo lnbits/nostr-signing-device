@@ -13,7 +13,7 @@ This very cheap off the shelf nostr signing device is designed to work with Lily
 Data is sent to/from the **Signing Device** over webdev Serial, not the most secure data transmission method, but x1000 better than storing the privatekey on a computer. Clients could support sending to the device directly, but using is Nos2X is far more convenient.
 
 ## Install instructions
-- Flash the hardware-wallet firmware directly from the browser using the [installer](https://lnbits.github.io/nostr-device)
+- Flash the nostr-signing firmware directly from the browser using the [installer](https://lnbits.github.io/nostr-signing-device/)
 ## Build instructions
 
 - Buy a Lilygo <a href="https://www.aliexpress.com/item/33048962331.html">Tdisplay</a> (although with a little tinkering any ESP32 will do) 
