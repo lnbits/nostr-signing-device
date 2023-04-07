@@ -37,15 +37,15 @@ TFT_eSPI tft = TFT_eSPI();
 
 
 // SD Cars
-#define SD_MISO     2
-#define SD_MOSI     15
-#define SD_SCLK     17
-#define SD_CS       13
+#define SD_MISO     13
+#define SD_MOSI     11
+#define SD_SCLK     12
+#define SD_CS       10
 
 
 // Buttons
 #define button1PinNumber 0
-#define button2PinNumber 35
+#define button2PinNumber 14
 
 
 //////////////////////////////// Define and initialize the Global State ////////////////////////////////

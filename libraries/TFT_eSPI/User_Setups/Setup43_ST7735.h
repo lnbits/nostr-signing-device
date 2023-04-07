@@ -1,5 +1,5 @@
 // Setup for ESP32 and ST7735 80 x 160 TFT
-
+#define USER_SETUP_ID 43
 // See SetupX_Template.h for all options available
 
 #define ST7735_DRIVER
@@ -10,6 +10,12 @@
 
 
 #define ST7735_GREENTAB160x80
+
+// For ST7735, ST7789 and ILI9341 ONLY, define the colour order IF the blue and red are swapped on your display
+// Try ONE option at a time to find the correct colour order for your display
+
+//  #define TFT_RGB_ORDER TFT_RGB  // Colour order Red-Green-Blue
+//  #define TFT_RGB_ORDER TFT_BGR  // Colour order Blue-Green-Red
 
 #ifdef ESP32
 #define TFT_MISO 19

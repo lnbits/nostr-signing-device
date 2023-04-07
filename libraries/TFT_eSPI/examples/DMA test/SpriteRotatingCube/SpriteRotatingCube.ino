@@ -56,7 +56,7 @@ TFT_eSprite spr[2] = {TFT_eSprite(&tft), TFT_eSprite(&tft) };
 // Toggle buffer selection
 bool sprSel = 0;
 
-// Pointers to start of Sprties in RAM
+// Pointers to start of Sprites in RAM
 uint16_t* sprPtr[2];
 
 // Define the cube face colors
@@ -305,7 +305,7 @@ void drawCube()
     p2y[i] = IHEIGHT / 2 + ay[i] * CUBE_SIZE / az[i];
   }
 
-  // Fill the buffer with color 0 (Black)
+  // Fill the buffer with colour 0 (Black)
   spr[sprSel].fillSprite(TFT_BLACK);
 
   for (int i = 0; i < 12; i++) {
@@ -353,7 +353,7 @@ void drawCube()
 uint32_t computePrimeNumbers(int32_t n) {
   if (n<2) return 1;
 
-  int32_t i, fact, j, p;
+  int32_t i, fact, j, p = 0;
 
   //Serial.print("\nPrime Numbers are: \n");
   for (i = 1; i <= n; i++)

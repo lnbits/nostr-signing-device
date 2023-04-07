@@ -7,7 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 // Select the SPI port to use
-SPIClass& spi = SPI;
+#ifdef TFT_SPI_PORT
+  SPIClass& spi = TFT_SPI_PORT;
+#else
+  SPIClass& spi = SPI;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////
 #if defined (TFT_SDA_READ) && !defined (TFT_PARALLEL_8_BIT)
@@ -168,7 +172,7 @@ void TFT_eSPI::pushPixels(const void* data_in, uint32_t len)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-#elif defined (ILI9488_DRIVER) // For 24 bit SPI colour TFT                             
+#elif defined (SPI_18BIT_DRIVER) // SPI 18 bit colour                         
 ////////////////////////////////////////////////////////////////////////////////////////
 
 /***************************************************************************************
