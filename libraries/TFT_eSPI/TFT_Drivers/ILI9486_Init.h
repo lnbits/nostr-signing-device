@@ -8,17 +8,27 @@
 {
 // From https://github.com/notro/fbtft/blob/master/fb_ili9486.c
 
-    //writecommand(0x01); // SW reset
-    //delay(120);
-	
+    writecommand(0x01); // SW reset
+    delay(120);
+
     writecommand(0x11); // Sleep out, also SW reset
     delay(120);
 
     writecommand(0x3A);
-    writedata(0x55);
- 
-    writecommand(0xC2);
-    writedata(0x44);
+    #if defined (TFT_PARALLEL_8_BIT) || defined (TFT_PARALLEL_16_BIT) || defined (RPI_DISPLAY_TYPE)
+      writedata(0x55);           // 16 bit colour interface
+    #else
+      writedata(0x66);           // 18 bit colour interface
+    #endif
+
+    writecommand(0xC0); //                          1100.0000 Power Control 1
+    writedata(0x0E);    //                          0001.0111   ... VRH1
+    writedata(0x0E);    //                          0001.0101   ... VRH2
+    writecommand(0xC1); //                          1100.0001 Power Control 2
+    writedata(0x41);    //                          0100.0001   . SAP BT
+    writedata(0x00);    //                          0000.0000   ..... VC
+    writecommand(0xC2); //                          1100.0010 Power Control 3
+    writedata(0x55);    //     nb. was 0x44         0101.0101   . DCA1 . DCA0
 
     writecommand(0xC5);
     writedata(0x00);
@@ -60,8 +70,12 @@
     writedata(0x20);
     writedata(0x00);
  
-    writecommand(0x20);                     // display inversion OFF
-  
+    #if defined (TFT_PARALLEL_8_BIT) || defined (TFT_PARALLEL_16_BIT) || defined (RPI_DISPLAY_TYPE)
+      writecommand(TFT_INVOFF);
+    #else
+      writecommand(TFT_INVON);
+    #endif
+ 
     writecommand(0x36);
     writedata(0x48);
 

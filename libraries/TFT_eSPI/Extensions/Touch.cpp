@@ -38,7 +38,7 @@ inline void TFT_eSPI::end_touch_read_write(void){
   #else
     spi.setFrequency(SPI_FREQUENCY);
   #endif
-  SET_BUS_WRITE_MODE;
+  //SET_BUS_WRITE_MODE;
 }
 
 /***************************************************************************************
@@ -106,6 +106,8 @@ uint16_t TFT_eSPI::getTouchRawZ(void){
   tz -= spi.transfer16(0x00) >> 3;  // Read Z2
 
   end_touch_read_write();
+
+  if (tz == 4095) tz = 0;
 
   return (uint16_t)tz;
 }
