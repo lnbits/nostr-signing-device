@@ -7,7 +7,7 @@ This fork and document is designed to track the changes needed for support of th
 - [WORKING] - Device pinouts updates
 - [WORKING] - Communication with web installer
 - [WORKING] - SPIFFS Storage
-- [Testing] - Sign a payload
+- [WORKING] - Sign a message payload (note1jzpsefqq39fxnqgcrktscn2d2fmlpng56zu5gusexl78c56982mq3qky9s)
  
 ## Troubleshooting
 1) SPIFFS storage w/ ESP32-S3 does not mount correctly upon boot
