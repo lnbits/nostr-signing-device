@@ -1,0 +1,56 @@
+name: arduino
+on: [ push, pull_request ]
+
+jobs:
+  build-for-esp32:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        fqbn:
+          - esp32:esp32:esp32
+          - esp32:esp32:esp32s3
+          - esp32:esp32:esp32c3
+          # future bluetooth chips
+          #- esp32:esp32:esp32c2
+          #- esp32:esp32:esp32c6
+          #- esp32:esp32:esp32h2
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: arduino/compile-sketches@v1
+        with:
+          enable-deltas-report: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fqbn: ${{ matrix.fqbn }}
+          platforms: |
+            - name: esp32:esp32
+              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          sketch-paths: |
+            - bitcoinSwitch
+          libraries: |
+            - name: WebSockets
+            - name: ArduinoJson
+          cli-compile-flags: |
+            - --warnings="none"
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sketches-reports
+          path: sketches-reports
+
+
+  report:
+    needs: build-for-esp32
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      # This step is needed to get the size data produced by the compile jobs
+      - name: Download sketches reports artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: sketches-reports
+          path: sketches-reports
+
+      - uses: arduino/report-size-deltas@v1
+        with:
+          sketches-reports-source: sketches-reports
