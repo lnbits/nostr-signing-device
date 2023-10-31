@@ -1,20 +1,26 @@
 #!/bin/sh
-git clone https://github.com/lnbits/lnbits.github.io mainpage
-cp -r ./mainpage/assets ./installer/main_assets
-rm -rf mainpage
+PROJECT_NAME=snsd
+RELEASE=https://github.com/lnbits/nostr-signing-device/releases/download
+INSTALLER_REPO=https://github.com/lnbits/hardware-installer
+INSTALLER_PATH=./hardware-installer/public/firmware
 
-mkdir -p ./installer/firmware/esp32
+git clone $INSTALLER_REPO
 
-for version in $(jq -r '.versions[]' ./installer/versions.json); do
-    mkdir -p ./installer/firmware/esp32/$version
-    wget https://github.com/lnbits/nostr-signing-device/releases/download/$version/manifest.json
-    mv manifest.json ./installer/firmware/esp32/$version
-    wget https://github.com/lnbits/nostr-signing-device/releases/download/$version/bootloader.bin
-    mv bootloader.bin ./installer/firmware/esp32/$version
-    wget https://github.com/lnbits/nostr-signing-device/releases/download/$version/boot_app0.bin
-    mv boot_app0.bin ./installer/firmware/esp32/$version
-    wget https://github.com/lnbits/nostr-signing-device/releases/download/$version/snsd.ino.bin
-    mv snsd.ino.bin ./installer/firmware/esp32/$version
-    wget https://github.com/lnbits/nostr-signing-device/releases/download/$version/snsd.ino.partitions.bin
-    mv snsd.ino.partitions.bin ./installer/firmware/esp32/$version
+cp README.md ./hardware-installer/public/README.md
+cp versions.json ./hardware-installer/src/versions.json
+cp config.js ./hardware-installer/src/config.js
+
+sed -i "s/%title%/$PROJECT_NAME/g" ./hardware-installer/index.html
+
+mkdir -p $INSTALLER_PATH
+for device in $(jq -r '.devices[]' ./hardware-installer/src/versions.json); do
+    for version in $(jq -r '.versions[]' ./hardware-installer/src/versions.json); do
+        mkdir -p $INSTALLER_PATH/$device/$version
+        wget $RELEASE/$version/$PROJECT_NAME.ino.bin
+        wget $RELEASE/$version/$PROJECT_NAME.ino.partitions.bin
+        wget $RELEASE/$version/$PROJECT_NAME.ino.bootloader.bin
+        mv $PROJECT_NAME.ino.bin $INSTALLER_PATH/$device/$version
+        mv $PROJECT_NAME.ino.partitions.bin $INSTALLER_PATH/$device/$version
+        mv $PROJECT_NAME.ino.bootloader.bin $INSTALLER_PATH/$device/$version
+    done
 done

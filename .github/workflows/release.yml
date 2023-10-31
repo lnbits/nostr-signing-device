@@ -25,7 +25,7 @@ jobs:
           tag: ${{ github.ref_name }}
         run: |
           tmp=$(mktemp)
-          jq --arg version $tag '.versions |= [$version] + .' installer/versions.json > "$tmp" && mv "$tmp" installer/versions.json
+          jq --arg version $tag '.versions |= [$version] + .' versions.json > "$tmp" && mv "$tmp" versions.json
           git config --global user.name 'Alan Bits'
           git config --global user.email 'alan@lnbits.com'
           git commit -am "[CHORE] update version to $tag"
@@ -43,16 +43,11 @@ jobs:
           tag: ${{ github.ref_name }}
         run: |
           sh build.sh
-          sh release.sh $tag
 
       - name: Create github release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
         run: |
-          gh release create "$tag" --generate-notes ./dist/$tag/manifest.json ./dist/$tag/bootloader.bin \
-            ./dist/$tag/boot_app0.bin ./dist/$tag/snsd.ino.bin ./dist/$tag/snsd.ino.partitions.bin
-
-  pages:
-    needs: [ release ]
-    uses: ./.github/workflows/static.yml
+          gh release create "$tag" --generate-notes ./build/snsd.ino.bootloader.bin \
+            ./build/snsd.ino.bin ./build/snsd.ino.partitions.bin
