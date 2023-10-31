@@ -7,9 +7,9 @@ jobs:
     strategy:
       matrix:
         fqbn:
-          - esp32:esp32:esp32
-          - esp32:esp32:esp32s3
-          - esp32:esp32:esp32c3
+          - esp32:esp32:ttgo-lora32
+          # - esp32:esp32:esp32s3
+          # - esp32:esp32:esp32c3
           # future bluetooth chips
           #- esp32:esp32:esp32c2
           #- esp32:esp32:esp32c6
@@ -26,12 +26,15 @@ jobs:
             - name: esp32:esp32
               source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
           sketch-paths: |
-            - bitcoinSwitch
-          libraries: |
-            - name: WebSockets
-            - name: ArduinoJson
+            - snsd
           cli-compile-flags: |
             - --warnings="none"
+          libraries: |
+            - name: ArduinoJson
+            - name: QRCode
+            - name: TFT_eSPI
+            - name: uBitcoin
+            # - name: tiny-AES-c
 
       - uses: actions/upload-artifact@v2
         with:
