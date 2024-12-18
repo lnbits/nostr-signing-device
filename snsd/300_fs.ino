@@ -2,8 +2,6 @@
 //=============================SPIFFS STUFF===============================//
 //========================================================================//
 
-
-
 FileData readFile(fs::FS &fs, const char * path) {
   logInfo("Reading file: " + String(path));
   struct FileData fd = {false, ""};
@@ -12,7 +10,6 @@ FileData readFile(fs::FS &fs, const char * path) {
     logInfo("Failed to open file for reading: " + String(path));
     return fd;
   }
-
 
   while (file.available()) {
     char c = (char)file.read();
@@ -25,16 +22,16 @@ FileData readFile(fs::FS &fs, const char * path) {
 }
 
 void writeFile(fs::FS &fs, const char * path, String message) {
-  logInfoSerial("Writing file: " + String(path));
+  logInfo("Writing file: " + String(path));
   File file = fs.open(path, FILE_WRITE);
   if (!file) {
-    logInfoSerial("Failed to open file for writing: " + String(path));
+    logInfo("Failed to open file for writing: " + String(path));
     return;
   }
   if (file.print(message)) {
-    logInfoSerial("File written: " + String(path));
+    logInfo("File written: " + String(path));
   } else {
-    logInfoSerial("Write failed: " + String(path));
+    logInfo("Write failed: " + String(path));
   }
   file.close();
 }
@@ -42,11 +39,11 @@ void writeFile(fs::FS &fs, const char * path, String message) {
 void appendFile(fs::FS &fs, const char * path, String message) {
   File file = fs.open(path, FILE_APPEND);
   if (!file) {
-    logInfoSerial("Failed to open file for appending: " + String(path));
+    logInfo("Failed to open file for appending: " + String(path));
     return;
   }
   if (!file.print(message)) {
-    logInfoSerial("Append failed: " + String(path));
+    logInfo("Append failed: " + String(path));
   }
   file.close();
 }

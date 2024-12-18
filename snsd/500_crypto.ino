@@ -1,70 +1,198 @@
-String hashStringData(String key) {
-  byte hash[64] = { 0 };
-  int hashLen = 0;
-  hashLen = sha256(key, hash);
-  return toHex(hash, hashLen);
+// Function to calculate modular square root using mini-gmp
+bool modular_sqrt(mpz_t result, const mpz_t n, const mpz_t p) {
+    mpz_t legendre, exponent, temp;
+    mpz_init(legendre);
+    mpz_init(exponent);
+    mpz_init(temp);
+
+    // Legendre symbol: (n/p) = n^((p-1)/2) mod p
+    mpz_sub_ui(temp, p, 1); // temp = p - 1
+    mpz_fdiv_q_ui(exponent, temp, 2); // exponent = (p - 1) / 2
+    mpz_powm(legendre, n, exponent, p); // legendre = n^((p-1)/2) mod p
+
+    if (mpz_cmp_ui(legendre, 1) != 0) {
+        // No modular square root exists
+        mpz_clear(legendre);
+        mpz_clear(exponent);
+        mpz_clear(temp);
+        return false;
+    }
+
+    // Direct calculation for p ≡ 3 (mod 4)
+    mpz_add_ui(temp, p, 1); // temp = p + 1
+    mpz_fdiv_q_ui(temp, temp, 4); // temp = (p + 1) / 4
+    mpz_powm(result, n, temp, p); // result = n^((p+1)/4) mod p
+
+    // Cleanup
+    mpz_clear(legendre);
+    mpz_clear(exponent);
+    mpz_clear(temp);
+    return true;
 }
 
-String encryptData(byte key[32], byte iv[16], String msg) {
-  // String has a trailing `null` character
-  // String.getBytes() can overwrite the last character with `null`.
-  // Add some extra-padding for safety
-  String data = msg + "        ";
+// Function to reconstruct full public key
+String reconstructPublicKey(const String &xHex) {
+    mpz_t x, y, rhs, p, a, b;
+    mpz_init(x);
+    mpz_init(y);
+    mpz_init(rhs);
+    mpz_init(p);
+    mpz_init(a);
+    mpz_init(b);
 
-  // Pad data for encryption. Length must be multiple of 16.
-  while (data.length() % 16 != 0) data += " ";
+    // Set curve parameters for secp256k1
+    mpz_set_str(p, "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16);
+    mpz_set_ui(a, 0); // a = 0
+    mpz_set_ui(b, 7); // b = 7
 
-  int byteSize = data.length();
-  byte messageBin[byteSize];
-  data.getBytes(messageBin, byteSize);
+    // Parse X-coordinate
+    mpz_set_str(x, xHex.c_str(), 16);
 
-  AES_ctx ctx;
-  AES_init_ctx_iv(&ctx, key, iv);
+    // Calculate rhs = x^3 + ax + b mod p
+    mpz_powm_ui(rhs, x, 3, p); // rhs = x^3 mod p
+    mpz_add(rhs, rhs, b); // rhs = x^3 + b mod p
+    mpz_mod(rhs, rhs, p); // Normalize rhs mod p
 
-  AES_CBC_encrypt_buffer(&ctx, messageBin, sizeof(messageBin));
+    // Calculate Y-coordinate
+    if (!modular_sqrt(y, rhs, p)) {
+        // Handle error: invalid public key
+        logInfo("Error: No modular square root exists for the given X-coordinate.");
+        mpz_clear(x);
+        mpz_clear(y);
+        mpz_clear(rhs);
+        mpz_clear(p);
+        mpz_clear(a);
+        mpz_clear(b);
+        return "";
+    }
 
-  return toHex(messageBin, sizeof(messageBin));
+    // Ensure even Y (mimic '02' prefix behavior)
+    if (mpz_odd_p(y)) {
+        mpz_sub(y, p, y);
+    }
+
+    // Convert X and Y back to hex strings
+    char xHexStr[65], yHexStr[65];
+    mpz_get_str(xHexStr, 16, x);
+    mpz_get_str(yHexStr, 16, y);
+
+    // Cleanup
+    mpz_clear(x);
+    mpz_clear(y);
+    mpz_clear(rhs);
+    mpz_clear(p);
+    mpz_clear(a);
+    mpz_clear(b);
+
+    // Return full 128-character public key
+    return String(xHexStr) + String(yHexStr);
 }
 
-String encryptDataWithIv(byte key[32], String msg) {
-  String data = String(msg.length()) + " " + msg;
+// Encrypt a direct message
+String encryptDirectMessageContent(const String &sharedSecretHex, const String &text) {
+    // Convert shared secret from hex to binary
+    uint8_t sharedSecret[32];
+    fromHex(sharedSecretHex, sharedSecret, 32);
 
-  // create random initialization vector
-  int ivSize = 16;
-  uint8_t iv[ivSize];
-  String tempMnemonic = generateStrongerMnemonic(24);
-  mnemonicToEntropy(tempMnemonic, iv, ivSize);
-  String ivHex = toHex(iv, ivSize);
+    // Generate a random IV
+    uint8_t iv[16];
+    generateRandomIV(iv, sizeof(iv));
 
-  String messageHex = encryptData(key, iv, data);
+    // Prepare plaintext with zero padding
+    String data = text;
+    while (data.length() % 16 != 0) data += char(0x00);
 
-  return messageHex + ivHex;
+    // Convert plaintext to byte array
+    int byteSize = data.length();
+    uint8_t messageBin[byteSize];
+    data.getBytes(messageBin, byteSize);
+
+    // Encrypt using AES-256-CBC
+    AES_ctx ctx;
+    AES_init_ctx_iv(&ctx, sharedSecret, iv);
+    AES_CBC_encrypt_buffer(&ctx, messageBin, byteSize);
+
+    // Base64 encode the ciphertext
+    size_t base64CiphertextLen = 0;
+    mbedtls_base64_encode(nullptr, 0, &base64CiphertextLen, messageBin, byteSize);
+    char base64Ciphertext[base64CiphertextLen + 1]; // +1 for null terminator
+    mbedtls_base64_encode((unsigned char *)base64Ciphertext, base64CiphertextLen + 1, &base64CiphertextLen, messageBin, byteSize);
+
+    // Base64 encode the IV
+    size_t base64IvLen = 0;
+    mbedtls_base64_encode(nullptr, 0, &base64IvLen, iv, sizeof(iv));
+    char base64Iv[base64IvLen + 1]; // +1 for null terminator
+    mbedtls_base64_encode((unsigned char *)base64Iv, base64IvLen + 1, &base64IvLen, iv, sizeof(iv));
+
+    // Combine Base64-encoded ciphertext and IV for transmission
+    String encryptedContent = String(base64Ciphertext) + "?iv=" + String(base64Iv);
+
+    // Trim any accidental whitespace or newlines (unlikely but a safeguard)
+    encryptedContent.trim();
+    return encryptedContent;
 }
 
+String decryptDirectMessageContent(const String &sharedSecretHex, const String &encryptedContent) {
+    // Find the separator between ciphertext and IV
+    int separatorIndex = encryptedContent.indexOf("?iv=");
+    if (separatorIndex == -1) {
+        logInfo("Decryption failed: Invalid format (missing ?iv=).");
+        return "";
+    }
 
-String decryptData(byte key[32], byte iv[16], String messageHex) {
-  int byteSize =  messageHex.length() / 2;
-  byte messageBin[byteSize];
-  fromHex(messageHex, messageBin, byteSize);
+    // Split ciphertext and IV
+    String encryptedMessageBase64 = encryptedContent.substring(0, separatorIndex);
+    String ivBase64 = encryptedContent.substring(separatorIndex + 4);
 
+    // Debug: Log split content
+    logInfo("Encrypted Message Base64: " + encryptedMessageBase64);
+    logInfo("IV Base64: " + ivBase64);
 
-  AES_ctx ctx;
-  AES_init_ctx_iv(&ctx, key, iv);
-  AES_CBC_decrypt_buffer(&ctx, messageBin, sizeof(messageBin));
+    // Decode Base64 for ciphertext
+    size_t ciphertextLen = 0;
+    size_t ciphertextMaxLen = encryptedMessageBase64.length(); // Estimate max length
+    uint8_t ciphertext[ciphertextMaxLen];
+    int ret = mbedtls_base64_decode(ciphertext, ciphertextMaxLen, &ciphertextLen,
+                                    (const unsigned char *)encryptedMessageBase64.c_str(),
+                                    encryptedMessageBase64.length());
+    if (ret != 0) {
+        logInfo("Decryption failed: Error decoding Base64 ciphertext.");
+        return "";
+    }
 
-  return String((char *)messageBin).substring(0, byteSize);
-}
+    // Decode Base64 for IV
+    size_t ivLen = 0;
+    size_t ivMaxLen = ivBase64.length(); // Estimate max length
+    uint8_t iv[ivMaxLen];
+    ret = mbedtls_base64_decode(iv, ivMaxLen, &ivLen,
+                                (const unsigned char *)ivBase64.c_str(), ivBase64.length());
+    if (ret != 0 || ivLen != 16) {
+        logInfo("Decryption failed: Error decoding Base64 IV or invalid IV length.");
+        return "";
+    }
 
-String decryptDataWithIv(byte key[32], String messageWithIvHex) {
-  int ivSize = 16;
-  String messageHex = messageWithIvHex.substring(0, messageWithIvHex.length() - ivSize * 2);
-  String ivHex = messageWithIvHex.substring(messageWithIvHex.length() - ivSize * 2, messageWithIvHex.length());
+    // Convert shared secret from hex to binary
+    uint8_t sharedSecret[32];
+    fromHex(sharedSecretHex, sharedSecret, 32);
 
-  uint8_t iv[ivSize];
-  fromHex(ivHex, iv, ivSize);
-  String decryptedData = decryptData(key, iv, messageHex);
+    // Decrypt using AES-256-CBC
+    AES_ctx ctx;
+    AES_init_ctx_iv(&ctx, sharedSecret, iv);
+    AES_CBC_decrypt_buffer(&ctx, ciphertext, ciphertextLen);
 
-  Command c = extractCommand(decryptedData);
-  int commandLength = c.cmd.toInt();
-  return c.data.substring(0, commandLength);
+    // Remove padding
+    uint8_t paddingLen = ciphertext[ciphertextLen - 1];
+    if (paddingLen > 16) {
+        logInfo("Decryption failed: Invalid padding.");
+        return "";
+    }
+
+    size_t plaintextLen = ciphertextLen - paddingLen;
+
+    // Convert to string and return
+    String decryptedData = String((char *)ciphertext).substring(0, plaintextLen);
+    logInfo("Decrypted Data: " + decryptedData);
+
+    // If no prefix is expected, simply return the data
+    return decryptedData;
 }

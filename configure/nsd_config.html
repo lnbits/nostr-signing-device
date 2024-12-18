@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serial Device Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #6200ea;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #ffffff;
+        }
+
+        h2 {
+            color: #6200ea;
+        }
+
+        div {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #6200ea;
+        }
+
+        select, input[type="text"], input[type="password"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4500b5;
+        }
+
+        #output {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #6200ea;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Serial Device Manager</h1>
+    </header>
+    <main>
+        <div>
+            <button id="connectDevice">Connect to Device</button>
+            <button id="disconnectDevice">Disconnect</button>
+        </div>
+
+        <div>
+            <label for="pinInput">Enter PIN:</label>
+            <input type="password" id="pinInput" placeholder="Enter your PIN">
+            <button id="sendPin">Send PIN</button>
+        </div>
+
+        <div>
+            <label for="commandDropdown">Select Command:</label>
+            <select id="commandDropdown">
+                <option value="/help">/help</option>
+                <option value="/ping">/ping</option>
+                <option value="/public-key">/public-key</option>
+                <option value="/sign-message">/sign-message</option>
+                <option value="/shared-secret">/shared-secret</option>
+                <option value="/add-key">/add-key</option>
+                <option value="/remove-key">/remove-key</option>
+                <option value="/list-keys">/list-keys</option>
+                <option value="/switch-key">/switch-key</option>
+                <option value="/new-key">/new-key</option>
+                <option value="/encrypt-message">/encrypt-message</option>
+                <option value="/decrypt-message">/decrypt-message</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="argumentsInput">Enter Arguments:</label>
+            <input type="text" id="argumentsInput" placeholder="e.g., key data or index">
+        </div>
+
+        <div>
+            <button id="sendCommand">Send Command</button>
+        </div>
+
+        <div id="output">
+            <h2>Output</h2>
+            <pre id="responseOutput" style="background-color: #070707;color: #ffffff;padding: 10px;"></pre>
+        </div>
+
+        <h2>Command Descriptions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Command</th>
+                    <th>Arguments</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>/help</td>
+                    <td>None</td>
+                    <td>Returns the help text.</td>
+                </tr>
+                <tr>
+                    <td>/ping</td>
+                    <td>None</td>
+                    <td>Checks the connection with the device.</td>
+                </tr>
+                <tr>
+                    <td>/public-key</td>
+                    <td>None</td>
+                    <td>Returns the public key in hex format.</td>
+                </tr>
+                <tr>
+                    <td>/sign-message</td>
+                    <td>Message to sign in hex format</td>
+                    <td>Signs the provided message with the active private key.</td>
+                </tr>
+                <tr>
+                    <td>/shared-secret</td>
+                    <td>Public key in hex format</td>
+                    <td>Generates a shared secret using the active private key.</td>
+                </tr>
+                <tr>
+                    <td>/add-key</td>
+                    <td>Private key in hex format</td>
+                    <td>Adds a new private key to the device.</td>
+                </tr>
+                <tr>
+                    <td>/remove-key</td>
+                    <td>Index of the key to remove</td>
+                    <td>Removes the private key at the specified index.</td>
+                </tr>
+                <tr>
+                    <td>/list-keys</td>
+                    <td>None</td>
+                    <td>Lists all stored private keys on the device.</td>
+                </tr>
+                <tr>
+                    <td>/switch-key</td>
+                    <td>None</td>
+                    <td>Switch the currently active private key.</td>
+                </tr>
+                <tr>
+                    <td>/new-key</td>
+                    <td>None</td>
+                    <td>Generates a new key on the device.</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        let port;
+        let reader;
+        let writer;
+
+        async function connectDevice() {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 9600 });
+                
+                const decoder = new TextDecoderStream();
+                const inputDone = port.readable.pipeTo(decoder.writable);
+                reader = decoder.readable.getReader();
+
+                const encoder = new TextEncoderStream();
+                const outputDone = encoder.readable.pipeTo(port.writable);
+                writer = encoder.writable.getWriter();
+
+                // Wait for the device to initialize if needed
+                setTimeout(() => {
+                    readLoop();
+                }, 500); // Delay to allow device to send initial data (adjust as necessary)
+                
+                alert("Device connected!");
+            } catch (err) {
+                console.error('Failed to connect device:', err);
+                alert('Failed to connect device.');
+            }
+        }
+
+        async function disconnectDevice() {
+            try {
+                if (reader) {
+                    reader.cancel();
+                    await reader.releaseLock();
+                }
+                if (writer) {
+                    await writer.close();
+                    await writer.releaseLock();
+                }
+                if (port) {
+                    await port.close();
+                }
+                alert("Device disconnected!");
+            } catch (err) {
+                console.error('Failed to disconnect device:', err);
+                alert('Failed to disconnect device.');
+            }
+        }
+
+        async function readLoop() {
+            let buffer = ""; // Buffer to accumulate incomplete lines
+            try {
+                while (port && port.readable && reader) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        console.log("Reader done.");
+                        break;
+                    }
+                    if (value) {
+                        buffer += value; // Append received chunk to the buffer
+                        let lines = buffer.split("\n"); // Split buffer into lines
+                        buffer = lines.pop(); // Keep the last (incomplete) line in the buffer
+                        for (let line of lines) {
+                            const trimmedLine = line.trim(); // Trim whitespace
+                            if (trimmedLine) {
+                                document.getElementById("responseOutput").textContent += trimmedLine + "\n";
+                            }
+                        }
+                    }
+                }
+                // Flush any remaining data in the buffer
+                if (buffer.trim()) {
+                    document.getElementById("responseOutput").textContent += buffer.trim() + "\n";
+                }
+            } catch (err) {
+                console.error('Error reading from device:', err);
+            }
+        }
+
+        async function sendCommandToDevice(command) {
+            if (!writer) {
+                alert("Device is not connected.");
+                return;
+            }
+            try {
+                // Clear the output log before sending the command
+                document.getElementById("responseOutput").textContent = "";
+                await writer.write(command + "\n");
+                document.getElementById("responseOutput").textContent += `Sent: ${command}\n`;
+            } catch (err) {
+                console.error('Error sending command:', err);
+                alert('Failed to send command.');
+            }
+        }
+
+        async function sendPin() {
+            const pin = document.getElementById('pinInput').value.trim();
+            if (!writer) {
+                alert("Device is not connected.");
+                return;
+            }
+            if (!pin) {
+                alert("Please enter a PIN.");
+                return;
+            }
+            try {
+                await writer.write(`${pin}\n`);
+                document.getElementById("responseOutput").textContent += `PIN sent\n`;
+            } catch (err) {
+                console.error('Error sending PIN:', err);
+                alert('Failed to send PIN.');
+            }
+        }
+
+        document.getElementById('connectDevice').addEventListener('click', connectDevice);
+        document.getElementById('disconnectDevice').addEventListener('click', disconnectDevice);
+
+        document.getElementById('sendCommand').addEventListener('click', () => {
+            const selectedCommand = document.getElementById('commandDropdown').value;
+            const argumentsInput = document.getElementById('argumentsInput').value.trim();
+            const fullCommand = argumentsInput ? `${selectedCommand} ${argumentsInput}` : selectedCommand;
+            sendCommandToDevice(fullCommand);
+        });
+
+        document.getElementById('sendPin').addEventListener('click', sendPin);
+    </script>
+</body>
+</html>

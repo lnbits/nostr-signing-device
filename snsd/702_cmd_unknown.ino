@@ -6,6 +6,6 @@
 */
 CommandResponse executeUnknown(String details) {
   logInfo("Unknown command: " + details);
-  logo();
+  displayLogoScreen();
   return {"",  ""};
 }

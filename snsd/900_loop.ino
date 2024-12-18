@@ -1,3 +1,7 @@
 void loop() {
-  listenForCommands();
+  if (!global.unlocked) {
+    displayLoginScreen();
+  } else {
+    listenForCommands();
+  }
 }

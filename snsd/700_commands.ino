@@ -4,11 +4,9 @@
 
 CommandResponse cmdRes = {"Nostr", "Signing Device"};
 
-
 void listenForCommands() {
   if (cmdRes.message != "" || cmdRes.subMessage != "")
-    showMessage(cmdRes.message, cmdRes.subMessage);
-
+    displayLogoScreen();
 
   // if the command does not handle an event then it bubbles it up
   EventData event = cmdRes.event;
@@ -37,7 +35,6 @@ bool isNotCommandEvent(String type) {
   return type != EVENT_SERIAL_DATA && type != EVENT_INTERNAL_COMMAND;
 }
 
-
 CommandResponse executeCommand(Command c) {
   if (c.cmd == COMMAND_SIGN_MESSAGE)
     return executeSignMessage(c.data);
@@ -48,80 +45,66 @@ CommandResponse executeCommand(Command c) {
   if (c.cmd == COMMAND_SHARED_SECRET)
     return executeSharedSecret(c.data);
 
-  if (c.cmd == COMMAND_RESTORE)
-    return executeResore(c.data);
-
-
-  if (c.cmd == COMMAND_SEED)
-    return executeShowSeed(c.data);
-
   if (c.cmd == COMMAND_PING)
     return executePing(c.data);
 
   if (c.cmd == COMMAND_HELP)
     return executeHelp(c.data);
 
+  if (c.cmd == COMMAND_RESTORE)
+    return executeRestore(c.data);
+
+  if (c.cmd == COMMAND_ADD_KEY)
+    return executeAddKey(c.data);
+
+  if (c.cmd == COMMAND_REMOVE_KEY)
+    return executeRemoveKey(c.data);
+
+  if (c.cmd == COMMAND_LIST_KEYS)
+    return executeListKeys(c.data);
+
+  if (c.cmd == COMMAND_NEW_KEY)
+    return executeNewKey(c.data);
+
+  if (c.cmd == COMMAND_ENCRYPT_MESSAGE)
+    return executeEncryptMessage(c.data);
+
+  if (c.cmd == COMMAND_DECRYPT_MESSAGE)
+    return executeDecryptMessage(c.data);
+
+  if (c.cmd == COMMAND_REBOOT)
+    return executeReboot(c.data);
+
+  if (c.cmd == COMMAND_WIPE)
+    return executeWipe(c.data);
 
   return executeUnknown(c.cmd + ": " + c.data);
-
-}
-
-
-HwwInitData initHww(String password, String mnemonic, String passphrase, bool persistSecrets) {
-  if (isValidPassword(password) == false)
-    return {"", "", false};
-
-  if (mnemonic == "") {
-    mnemonic = generateStrongerMnemonic(24); // todo: allow 12 also
-  }
-
-  String passwordHash  = hashStringData(password);
-
-  if (persistSecrets == true) {
-    deleteFile(SPIFFS, global.mnemonicFileName.c_str());
-    deleteFile(SPIFFS, global.passwordFileName.c_str());
-    writeFile(SPIFFS, global.passwordFileName.c_str(), passwordHash);
-
-    int byteSize =  passwordHash.length() / 2;
-    byte encryptionKey[byteSize];
-    fromHex(passwordHash, encryptionKey, byteSize);
-
-    writeFile(SPIFFS, global.mnemonicFileName.c_str(), encryptDataWithIv(encryptionKey, mnemonic));
-  }
-
-  return {passwordHash, mnemonic, true};
 }
 
 void sendCommandOutput(String command, String commandData) {
   Serial.println(command + " " + commandData);
 }
 
-
-void commandOutToFile(const String msg) {
-  if (global.hasCommandsFile == true) {
-    appendFile(SD, global.commandsOutFileName.c_str(), msg + "\n");
-  }
+void savePIN(String pinCode) {
+  writeFile(SPIFFS, global.pinFileName.c_str(), pinCode);
 }
 
-
-EventData toggleDatanAndQR(String data, bool showQR) {
-  String dataUpper = data + "";
-  dataUpper.toUpperCase();
-
-  EventData event = {EVENT_BUTTON_ACTION, "0 1"};
-  while (event.type == EVENT_BUTTON_ACTION) {
-    String buttonState = getWordAtPosition(event.data, 1);
-
-    if (buttonState == "1") {
-      if (showQR == true) {
-        showQRCode(dataUpper);
-      } else {
-        showMessage(data, "");
-      }
-    } else {
-      showQR = !showQR;
-    }
-    event = awaitEvent();
+void loadPIN() {
+  // Load the expected PIN number
+  FileData pinFile = readFile(SPIFFS, global.pinFileName.c_str());
+  if (pinFile.success) {
+    global.pinCode = pinFile.data;
+  } else {
+    // Default to not set
+    global.pinCode = "00000000";
   }
-  return event;
+
+  // Load the PIN attempts
+  FileData attemptsFile = readFile(SPIFFS, global.pinAttemptsFileName.c_str());
+  if (attemptsFile.success) {
+    global.pinAttempts = attemptsFile.data.toInt();
+  } else {
+    // Default to zero
+    global.pinAttempts = 0;
+  }
 }
