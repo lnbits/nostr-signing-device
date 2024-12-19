@@ -38,6 +38,9 @@ void displayWipeDeviceScreen() {
           return;
         }
       }
+    } else if (event.type == EVENT_SCREEN_IDLE) {
+      displayLogoScreen();
+      return;
     }
   }
 }

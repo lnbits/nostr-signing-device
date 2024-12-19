@@ -37,7 +37,7 @@ EventData awaitSerialEvent() {
     if  ((millis() - waitTime) > global.screenTimeout * 1000) {
       waitTime = millis();
       if(global.unlocked) {
-        displayLogoScreen();
+        return {EVENT_SCREEN_IDLE,""};
       }
     }
 

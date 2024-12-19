@@ -3,16 +3,13 @@ CommandResponse executeEncryptMessage(String data) {
     
     // Get the shared secret as the 3rd party public key
     String thirdPartyPublicKey = getTokenAtPosition(data, " ", 0);
+    
+    thirdPartyPublicKey.trim();
 
-    // Check key is valid format and convert if needed
-    if(isValidBech32Key(thirdPartyPublicKey, false)) {
-      thirdPartyPublicKey = nostrToHex(thirdPartyPublicKey);
-    } else {
-      thirdPartyPublicKey.toLowerCase();
-      if(!isValidHexKey(thirdPartyPublicKey)) {
-        showMessage("Encrypt Message", "Invalid 3rd party public key.");
-        return {"", ""};
-      }
+    thirdPartyPublicKey.toLowerCase();
+    if(!isValidHexKey(thirdPartyPublicKey)) {
+      showMessage("Encrypt Message", "Invalid 3rd party public key.");
+      return {"", ""};
     }
 
     String sharedSecretHex = generateSharedSecret(thirdPartyPublicKey);

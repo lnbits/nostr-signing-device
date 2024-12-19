@@ -18,6 +18,7 @@
 #include <vector>
 #include <gmp-ino.h>
 #include "mbedtls/base64.h"
+#include <map>
 
 fs::SPIFFSFS &FlashFS = SPIFFS;
 
@@ -46,6 +47,8 @@ struct GlobalState {
   bool hasCommandsFile;
   String commands;
   std::vector<String> privateKeys;
+  std::map<String, String> keyNames;
+  String keyNamesFileName;
   int activeKeyIndex;
   String pinCode;
   int pinAttempts;
@@ -74,6 +77,8 @@ GlobalState global = {
   false,
   "",
   {},
+  {},
+  "/key_names.txt",
   0,
   "00000000",
   0,
@@ -97,7 +102,7 @@ struct EnvironmentVariables {
 };
 
 EnvironmentVariables env = {
-  "20241218.1313",
+  "20241219.0938",
 };
 ////////////////////////////////           Env Vars End            ////////////////////////////////
 

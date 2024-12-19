@@ -43,6 +43,13 @@ void saveKeys() {
     keysData += key + "\n"; // Each key on a new line
   }
   writeFile(SPIFFS, global.privateKeysFileName.c_str(), keysData);
+
+  // Save key names
+  String namesData = "";
+  for (auto &pair : global.keyNames) {
+    namesData += pair.first + "|" + pair.second + "\n"; // Key|Name format
+  }
+  writeFile(SPIFFS, global.keyNamesFileName.c_str(), namesData);
 }
 
 int countLines(String data, char delimiter = '\n') {
@@ -71,6 +78,27 @@ void loadKeys() {
     logInfo("Keys loaded: " + String(global.privateKeys.size()));
   } else {
     logInfo("No keys file found, starting fresh");
+    return;
+  }
+
+  // Load key names
+  FileData namesFile = readFile(SPIFFS, global.keyNamesFileName.c_str());
+  if (namesFile.success) {
+    global.keyNames.clear();
+    String namesData = namesFile.data;
+    int lineCount = countLines(namesData, '\n');
+    for (int i = 0; i < lineCount; i++) {
+      String line = getLineAtPosition(namesData, i);
+      if (!line.isEmpty()) {
+        int delimiterIndex = line.indexOf('|');
+        if (delimiterIndex != -1) {
+          String key = line.substring(0, delimiterIndex);
+          String name = line.substring(delimiterIndex + 1);
+          global.keyNames[key] = name;
+        }
+      }
+    }
+    logInfo("Key names loaded: " + String(global.keyNames.size()));
   }
 }
 

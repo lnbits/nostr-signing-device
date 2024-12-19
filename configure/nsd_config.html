@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serial Device Manager</title>
+    <title>Nostr Signing Device Configuration Tool</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
 
         main {
             padding: 20px;
-            max-width: 800px;
+            width: 1000px;
             margin: 0 auto;
         }
 
@@ -101,18 +101,12 @@
 </head>
 <body>
     <header>
-        <h1>Serial Device Manager</h1>
+        <h1>Nostr Signing Device Configuration Tool</h1>
     </header>
     <main>
         <div>
             <button id="connectDevice">Connect to Device</button>
             <button id="disconnectDevice">Disconnect</button>
-        </div>
-
-        <div>
-            <label for="pinInput">Enter PIN:</label>
-            <input type="password" id="pinInput" placeholder="Enter your PIN">
-            <button id="sendPin">Send PIN</button>
         </div>
 
         <div>
@@ -123,13 +117,17 @@
                 <option value="/public-key">/public-key</option>
                 <option value="/sign-message">/sign-message</option>
                 <option value="/shared-secret">/shared-secret</option>
+                <option value="/restore">/restore</option>
                 <option value="/add-key">/add-key</option>
                 <option value="/remove-key">/remove-key</option>
                 <option value="/list-keys">/list-keys</option>
                 <option value="/switch-key">/switch-key</option>
                 <option value="/new-key">/new-key</option>
+                <option value="/name-key">/name-key</option>
                 <option value="/encrypt-message">/encrypt-message</option>
                 <option value="/decrypt-message">/decrypt-message</option>
+                <option value="/reboot">/reboot</option>
+                <option value="/wipe">/wipe</option>
             </select>
         </div>
 
@@ -151,8 +149,9 @@
         <table>
             <thead>
                 <tr>
-                    <th>Command</th>
-                    <th>Arguments</th>
+                    <th width="150px">Command</th>
+                    <th width="250px">Argument 1</th>
+                    <th width="250px">Argument 2</th>
                     <th>Description</th>
                 </tr>
             </thead>
@@ -160,52 +159,98 @@
                 <tr>
                     <td>/help</td>
                     <td>None</td>
+                    <td>None</td>
                     <td>Returns the help text.</td>
                 </tr>
                 <tr>
                     <td>/ping</td>
+                    <td>None</td>
                     <td>None</td>
                     <td>Checks the connection with the device.</td>
                 </tr>
                 <tr>
                     <td>/public-key</td>
                     <td>None</td>
+                    <td>None</td>
                     <td>Returns the public key in hex format.</td>
                 </tr>
                 <tr>
                     <td>/sign-message</td>
                     <td>Message to sign in hex format</td>
+                    <td>None</td>
                     <td>Signs the provided message with the active private key.</td>
                 </tr>
                 <tr>
                     <td>/shared-secret</td>
                     <td>Public key in hex format</td>
+                    <td>None</td>
                     <td>Generates a shared secret using the active private key.</td>
+                </tr>
+                <tr>
+                    <td>/restore</td>
+                    <td>Private key in hex format</td>
+                    <td>None</td>
+                    <td>Legacy support with v0.1 installer config button.</td>
                 </tr>
                 <tr>
                     <td>/add-key</td>
                     <td>Private key in hex format</td>
+                    <td>None</td>
                     <td>Adds a new private key to the device.</td>
                 </tr>
                 <tr>
                     <td>/remove-key</td>
                     <td>Index of the key to remove</td>
+                    <td>None</td>
                     <td>Removes the private key at the specified index.</td>
                 </tr>
                 <tr>
                     <td>/list-keys</td>
                     <td>None</td>
+                    <td>None</td>
                     <td>Lists all stored private keys on the device.</td>
                 </tr>
                 <tr>
                     <td>/switch-key</td>
+                    <td>Index of the key to switch to</td>
                     <td>None</td>
                     <td>Switch the currently active private key.</td>
                 </tr>
                 <tr>
                     <td>/new-key</td>
                     <td>None</td>
+                    <td>None</td>
                     <td>Generates a new key on the device.</td>
+                </tr>
+                <tr>
+                    <td>/name-key</td>
+                    <td>The name of the key</td>
+                    <td>None</td>
+                    <td>Set the name of a key. Blank removes the name.</td>
+                </tr>
+                <tr>
+                    <td>/encrypt-message</td>
+                    <td>3rd party public key in hex format</td>
+                    <td>The message to encrypt</td>
+                    <td>Encrypts the message on the device (NIP-04) and returns the encrypted message.</td>
+                </tr>
+                <tr>
+                    <td>/decrypt-message</td>
+                    <td>3rd party public key in hex format</td>
+                    <td>The message to decrypt</td>
+                    <td>Decrypts the message on the device (NIP-04) and returns the decrypted message.</td>
+                </tr>
+                <tr>
+                    <td>/reboot</td>
+                    <td>None</td>
+                    <td>None</td>
+                    <td>Reboots the device.</td>
+                </tr>
+                <tr>
+                    <td>/wipe</td>
+                    <td>None</td>
+                    <td>None</td>
+                    <td>Erases the device. All keys and config is removed.</td>
                 </tr>
             </tbody>
         </table>
@@ -307,25 +352,6 @@
             }
         }
 
-        async function sendPin() {
-            const pin = document.getElementById('pinInput').value.trim();
-            if (!writer) {
-                alert("Device is not connected.");
-                return;
-            }
-            if (!pin) {
-                alert("Please enter a PIN.");
-                return;
-            }
-            try {
-                await writer.write(`${pin}\n`);
-                document.getElementById("responseOutput").textContent += `PIN sent\n`;
-            } catch (err) {
-                console.error('Error sending PIN:', err);
-                alert('Failed to send PIN.');
-            }
-        }
-
         document.getElementById('connectDevice').addEventListener('click', connectDevice);
         document.getElementById('disconnectDevice').addEventListener('click', disconnectDevice);
 
@@ -335,8 +361,6 @@
             const fullCommand = argumentsInput ? `${selectedCommand} ${argumentsInput}` : selectedCommand;
             sendCommandToDevice(fullCommand);
         });
-
-        document.getElementById('sendPin').addEventListener('click', sendPin);
     </script>
 </body>
 </html>

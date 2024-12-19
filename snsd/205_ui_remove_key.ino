@@ -9,8 +9,8 @@ void displayRemoveKeyScreen() {
 
     int totalKeys = global.privateKeys.size();
     int selectedIndex = global.activeKeyIndex;
-    String keyPreview = previewString(hexToNostr(getPublicKey(global.privateKeys[selectedIndex]), "npub"));
-
+    String privateKeyHex = global.privateKeys[selectedIndex];
+    String keyPreview = padRightWithSpaces(global.keyNames.count(privateKeyHex) ? global.keyNames[privateKeyHex] : previewString(hexToNostr(getPublicKey(privateKeyHex), "npub")), 20).substring(0,20);
     unsigned long lastButton1Press = 0;
 
     // Full screen clear
@@ -44,7 +44,8 @@ void displayRemoveKeyScreen() {
                     if (currentMillis - lastButton1Press > global.debounceDelay) {
                         lastButton1Press = currentMillis;
                         selectedIndex = (selectedIndex + 1) % totalKeys;
-                        keyPreview = previewString(hexToNostr(getPublicKey(global.privateKeys[selectedIndex]), "npub"));
+                        privateKeyHex = global.privateKeys[selectedIndex];
+                        keyPreview = padRightWithSpaces(global.keyNames.count(privateKeyHex) ? global.keyNames[privateKeyHex] : previewString(hexToNostr(getPublicKey(privateKeyHex), "npub")), 20).substring(0,20);
                     }
                 } else if (buttonNumber == "1") {
                     CommandResponse response = executeRemoveKey(String(selectedIndex));
@@ -58,6 +59,9 @@ void displayRemoveKeyScreen() {
                     return;
                 }
             }
+        } else if (event.type == EVENT_SCREEN_IDLE) {
+          displayLogoScreen();
+          return;
         }
     }
 }

@@ -29,17 +29,12 @@ CommandResponse executeRestore(String privateKey) {
 }
 
 CommandResponse executeAddKey(String privateKey) {
-  // Check key is valid format and convert if needed
   privateKey.trim();
 
-  if (isValidBech32Key(privateKey, true)) {
-    privateKey = nostrToHex(privateKey);
-  } else {
-    privateKey.toLowerCase();
-    if (!isValidHexKey(privateKey)) {
-      showMessage("Add key", "Invalid private key.");
-      return {"", ""};
-    }
+  privateKey.toLowerCase();
+  if(!isValidHexKey(privateKey)) {
+    showMessage("Add Key", "Invalid private key hex.");
+    return {"", ""};
   }
 
   // Check if the key already exists
@@ -65,7 +60,9 @@ CommandResponse executeRemoveKey(String indexStr) {
   if (index < 0 || index >= global.privateKeys.size()) {
     return {"Error", "Invalid index"};
   }
+  String key = global.privateKeys[index];
   global.privateKeys.erase(global.privateKeys.begin() + index);
+  global.keyNames.erase(key); // Remove name if exists
   if (global.activeKeyIndex >= global.privateKeys.size()) {
     global.activeKeyIndex = 0;
   }
@@ -79,10 +76,26 @@ CommandResponse executeRemoveKey(String indexStr) {
 
 CommandResponse executeListKeys(String data) {
   for (int i = 0; i < global.privateKeys.size(); i++) {
-    String preview = hexToNostr(getPublicKey(global.privateKeys[i]), "npub");
-    sendCommandOutput(COMMAND_LIST_KEYS, String(i) + ": " + preview);
+    String key = global.privateKeys[i];
+    String publicKeyHex = getPublicKey(key);
+    String name = global.keyNames.count(key) ? global.keyNames[key] : "(Unnamed)";
+    sendCommandOutput(COMMAND_LIST_KEYS, String(i) + ": " + publicKeyHex + " - " + name);
   }
   return {"Listed Keys", "Check output"};
+}
+
+CommandResponse executeSwitchKey(String indexStr) {
+ int index = indexStr.toInt();
+  if (index < 0 || index >= global.privateKeys.size()) {
+    return {"Error", "Invalid index"};
+  }
+  global.activeKeyIndex = index;
+  saveActiveKeyIndex();
+
+  Serial.println(COMMAND_SWITCH_KEY + " 0 ");
+
+  showMessage("Key Selected", "Index: " + String(index));
+  return {"Key Selected", "Index: " + String(index)};
 }
 
 CommandResponse executeNewKey(String data) {
@@ -95,6 +108,43 @@ CommandResponse executeNewKey(String data) {
 
   showMessage("New Key Added", "Total: " + String(global.privateKeys.size()));
   return {"New Key Added", "Total: " + String(global.privateKeys.size())};
+}
+
+CommandResponse executeNameKey(String data) {
+  if (data == "") return {"Error", "No input provided"};
+  
+  // Get the key index and name
+  String indexStr = getTokenAtPosition(data, " ", 0);
+
+  int firstSpaceIndex = data.indexOf(" ");
+  String name = (firstSpaceIndex != -1) ? data.substring(firstSpaceIndex + 1) : "";
+  name.trim();
+
+  // Parse the index
+  int index = indexStr.toInt();
+  if (index < 0 || index >= global.privateKeys.size()) {
+    return {"Error", "Invalid index"};
+  }
+
+  String key = global.privateKeys[index];
+
+  if (name.isEmpty()) {
+    // Remove the name if the input name is blank
+    if (global.keyNames.count(key)) {
+      global.keyNames.erase(key); // Remove the name from the map
+      saveKeys();
+      showMessage("Key Name Removed", "Key at index " + indexStr + " had its name removed");
+      return {"Key Name Removed", "Key at index " + indexStr + " had its name removed"};
+    } else {
+      return {"Error", "No name to remove for this key"};
+    }
+  } else {
+    // Set or update the name
+    global.keyNames[key] = name;
+    saveKeys();
+    showMessage("Key Name Set", "Key at index " + indexStr + " named '" + name + "'");
+    return {"Key Name Set", "Key at index " + indexStr + " named '" + name + "'"};
+  }
 }
 
 void saveActiveKeyIndex() {

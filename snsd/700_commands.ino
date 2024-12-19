@@ -63,8 +63,14 @@ CommandResponse executeCommand(Command c) {
   if (c.cmd == COMMAND_LIST_KEYS)
     return executeListKeys(c.data);
 
+  if (c.cmd == COMMAND_SWITCH_KEY)
+    return executeSwitchKey(c.data);
+
   if (c.cmd == COMMAND_NEW_KEY)
     return executeNewKey(c.data);
+  
+  if (c.cmd == COMMAND_NAME_KEY)
+    return executeNameKey(c.data);
 
   if (c.cmd == COMMAND_ENCRYPT_MESSAGE)
     return executeEncryptMessage(c.data);

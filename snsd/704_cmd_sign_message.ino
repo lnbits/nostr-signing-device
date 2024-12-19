@@ -14,7 +14,8 @@ CommandResponse executeSignMessage(String messageHex) {
   }
 
   int selectedIndex = global.activeKeyIndex;
-  String keyPreview = getPublicKey(global.privateKeys[selectedIndex]).substring(0, 16) + "...";
+  String privateKeyHex = global.privateKeys[selectedIndex];
+  String keyPreview = padRightWithSpaces(global.keyNames.count(privateKeyHex) ? global.keyNames[privateKeyHex] : previewString(hexToNostr(getPublicKey(privateKeyHex), "npub")), 20).substring(0,20);
 
   unsigned long lastButton2Press = 0;
 
