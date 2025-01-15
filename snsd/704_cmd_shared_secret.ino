@@ -5,11 +5,14 @@
                         The format must be 128 hex characters, 64 bytes (x,y). No `02`, `03` or `04` prefixes.
    @return CommandResponse
 */
-CommandResponse executeSharedSecret(String publicKeyHex) {
-  // todo: validate is hex and size
-  FileData nostrFile = readFile(SPIFFS, global.nostrFileName.c_str());
-  // todo: check success
-  String privateKeyHex = nostrFile.data;
+
+String generateSharedSecret(String publicKeyHex) {
+  // Reconstruct full public key if only X-coordinate is provided
+  if (publicKeyHex.length() == 64) {
+    publicKeyHex = reconstructPublicKey(publicKeyHex);
+  }
+
+  String privateKeyHex = global.privateKeys[global.activeKeyIndex];
 
   int byteSize =  32;
   byte privateKeyBytes[byteSize];
@@ -23,9 +26,12 @@ CommandResponse executeSharedSecret(String publicKeyHex) {
   PublicKey otherPublicKey(publicKeyBin, true);
   privateKey.ecdh(otherPublicKey, sharedSecret, false);
 
-  String sharedSecretHex = toHex(sharedSecret, sizeof(sharedSecret));
+  return toHex(sharedSecret, sizeof(sharedSecret));
+}
+
+CommandResponse executeSharedSecret(String publicKeyHex) {
+  String sharedSecretHex = generateSharedSecret(publicKeyHex);
   sendCommandOutput(COMMAND_SHARED_SECRET, sharedSecretHex);
 
   return {"Shared Secret", "sent..."};
 }
-

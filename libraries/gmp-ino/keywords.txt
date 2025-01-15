@@ -1,0 +1,12 @@
+# Syntax Coloring Map For ExampleLibrary
+
+# Datatypes (KEYWORD1)
+mpn_t   KEYWORD1
+mpz_t   KEYWORD1
+mpq_t   KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+
+# Instances (KEYWORD2)
+
+# Constants (LITERAL1)

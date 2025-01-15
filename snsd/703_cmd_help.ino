@@ -5,30 +5,15 @@
    @return CommandResponse
 */
 CommandResponse executeHelp(String commandData) {
-  help();
-  return {"More info at:", "github.com/lnbits/hardware-wallet"};
-}
-
-void help()
-{
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.setTextSize(2);
-  tft.setCursor(0, 0);
-  tft.println("Commands");
-  tft.setCursor(0, 20);
-  tft.setTextSize(1);
-
-  tft.println("'/help' show available commands");
-  tft.println("'/sign' sign a random message");
-  tft.println("'/shared-secret' build a shared secret using an external public key");
-  tft.println("'/seed' will show the seed on the device display");
-
   logInfo("Commands");
   logInfo("'/help' show available commands");
-  logInfo("'/sign-message' sign a random message");
+  logInfo("'/ping' checks the connection with the device");
+  logInfo("'/public-key' returns the public key in hex format");
+  logInfo("'/sign-message' sign a message using the private key");
   logInfo("'/shared-secret' build a shared secret using an external public key");
-  logInfo("'/seed' will show the seed on the device display");
-
-  delay(10000);
+  logInfo("'/add-key' add a new private key to the wallet");
+  logInfo("'/remove-key' remove an existing private key by index");
+  logInfo("'/list-keys' list all stored private keys");
+  logInfo("'/new-key' generate a new private key");
+  return {"More info at:", "github.com/lnbits/nostr-signing-device"};
 }

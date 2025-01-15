@@ -4,9 +4,7 @@
    @return CommandResponse
 */
 CommandResponse executePublicKey(String data) {
-
-  FileData nostrFile = readFile(SPIFFS, global.nostrFileName.c_str()); // todo: check success
-  String privateKeyHex = nostrFile.data;
+  String privateKeyHex = global.privateKeys[global.activeKeyIndex];
   int byteSize =  32;
   byte privateKeyBytes[byteSize];
   fromHex(privateKeyHex, privateKeyBytes, byteSize);
@@ -16,7 +14,7 @@ CommandResponse executePublicKey(String data) {
   String publicKeyHex = toHex(publicKey.point, sizeof(publicKey.point));
   sendCommandOutput(COMMAND_PUBLIC_KEY, publicKeyHex.substring(0, 64));
 
-
-
+  showMessage("Public key", publicKeyHex.substring(0, 16) + "...");
+  
   return {"Public Key", publicKeyHex.substring(0, 16) + "..."};
 }
