@@ -1,18 +1,20 @@
         //////////////////////////////////////////////////////////////
         //           Setup for STM32 and ILI9341 display            //
         //////////////////////////////////////////////////////////////
-
+#define USER_SETUP_ID 35
 // Last update by Bodmer: 28/3/20
 
 // Define STM32 to invoke STM32 optimised driver
 #define STM32
 
-// Define if Port A (or B) pins 0-7 are used for data bus bits 0-7
+// Define if Port A (B, C or D) pins 0-7 are used for data bus bits 0-7
 // this will improve rendering performance by a factor of ~8x
 #define STM_PORTA_DATA_BUS
 //#define STM_PORTB_DATA_BUS // Pins below must re re-allocated to use this option
+//#define STM_PORTC_DATA_BUS // Pins below must re re-allocated to use this option
+//#define STM_PORTD_DATA_BUS // Pins below must re re-allocated to use this option
 
-// Tell the library to use 8 bit parallel mode (otherwise SPI is assumed)
+// Tell the library to use 8-bit parallel mode (otherwise SPI is assumed)
 #define TFT_PARALLEL_8_BIT
 
 // Define ONE of the the TFT display drivers
@@ -28,7 +30,7 @@
 #define TFT_WR  PB9 // Write strobe control pin
 #define TFT_RD  PB1 // Read pin
 
-#define TFT_D0 PA0 // 8 bit Port A parallel bus to TFT
+#define TFT_D0 PA0 // 8-bit Port A parallel bus to TFT
 #define TFT_D1 PA1
 #define TFT_D2 PA2
 #define TFT_D3 PA3

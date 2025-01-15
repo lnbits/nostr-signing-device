@@ -15,23 +15,23 @@ CommandResponse executeSignMessage(String messageHex) {
 
   int selectedIndex = global.activeKeyIndex;
   String privateKeyHex = global.privateKeys[selectedIndex];
-  String keyPreview = padRightWithSpaces(global.keyNames.count(privateKeyHex) ? global.keyNames[privateKeyHex] : previewString(hexToNostr(getPublicKey(privateKeyHex), "npub")), 20).substring(0,20);
+  String keyPreview = padRightWithSpaces(global.keyNames.count(privateKeyHex) ? global.keyNames[privateKeyHex] : previewString(hexToNostr(getPublicKey(privateKeyHex), "npub")), 20);
 
   unsigned long lastButton2Press = 0;
 
   while (true) {
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.fillScreen(global.backgroundColor);
+    tft.setTextColor(global.foregroundColor, global.backgroundColor);
     tft.setTextSize(2);
     tft.setCursor(0, 10);
     tft.println("Sign Request:");
     tft.println("");
-    tft.setTextColor(TFT_LNBITS_PURPLE, TFT_BLACK);
+    tft.setTextColor(global.accentColor, global.backgroundColor);
     tft.println("Key: " + keyPreview);
     tft.println("");
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setCursor(0, 90);
+    tft.setTextColor(global.foregroundColor, global.backgroundColor);
+    tft.setCursor(0, 100 * global.scaleFactor);
     tft.println("Top to accept");
     tft.println("Bottom to reject");
 

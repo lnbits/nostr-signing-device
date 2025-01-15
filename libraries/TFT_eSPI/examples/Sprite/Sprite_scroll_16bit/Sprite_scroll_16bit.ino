@@ -5,7 +5,7 @@
   https://github.com/Bodmer/TFT_eSPI
 
   The sketch has been tested on a 320x240 ILI9341 based TFT, it
-  coule be adapted for other screen sizes.
+  could be adapted for other screen sizes.
 
   A Sprite is notionally an invisible graphics screen that is
   kept in the processors RAM. Graphics can be drawn into the
@@ -16,7 +16,7 @@
 
   The Sprite occupies (2 * width * height) bytes.
 
-  On a ESP8266 Sprite sizes up to 128 x 160 can be accomodated,
+  On a ESP8266 Sprite sizes up to 128 x 160 can be accommodated,
   this size requires 128*160*2 bytes (40kBytes) of RAM, this must be
   available or the processor will crash. You need to make the sprite
   small enough to fit, with RAM spare for any "local variables" that
@@ -126,7 +126,7 @@ void numberBox(int num, int x, int y)
   // Fill it with black
   img.fillSprite(TFT_BLACK);
 
-  // Draw a backgorund of 2 filled triangles
+  // Draw a background of 2 filled triangles
   img.fillTriangle(  0, 0,  0, 49, 40, 25, TFT_RED);
   img.fillTriangle( 79, 0, 79, 49, 40, 25, TFT_DARKGREEN);
 
@@ -150,14 +150,14 @@ void numberBox(int num, int x, int y)
 
 
 // #########################################################################
-// Return a 16 bit rainbow colour
+// Return a 16-bit rainbow colour
 // #########################################################################
 unsigned int rainbow(byte value)
 {
   // Value is expected to be in range 0-127
   // The value is converted to a spectrum colour from 0 = red through to 127 = blue
 
-  byte red   = 0; // Red is the top 5 bits of a 16 bit colour value
+  byte red   = 0; // Red is the top 5 bits of a 16-bit colour value
   byte green = 0;// Green is the middle 6 bits
   byte blue  = 0; // Blue is the bottom 5 bits
 

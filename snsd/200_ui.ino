@@ -8,40 +8,44 @@ void displayLogoScreen() {
 
   global.onLogo = true;
 
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(global.backgroundColor);
 
-  int centerX = 240 / 2;
-  int centerY = 135 / 2;
-  int circleRadius = 50;
+  // Find the center of the screen
+  int centerX = REAL_SCREEN_WIDTH / 2;
+  int centerY = REAL_SCREEN_HEIGHT / 2;
+
+  // Scale the circle radius
+  float scale = global.scaleFactor;
+  int circleRadius = 50 * scale;
 
   // Draw the purple circle
-  tft.fillCircle(centerX, centerY, circleRadius, TFT_LNBITS_PURPLE);
+  tft.fillCircle(centerX, centerY, circleRadius, global.accentColor);
 
-  // Draw the lightning bolt
-  int xOffset = centerX - 15;
-  int yOffset = centerY - 35;
+  // Scale and draw the lightning bolt
+  int xOffset = centerX - 15 * scale;
+  int yOffset = centerY - 35 * scale;
 
-  tft.fillTriangle(xOffset + 0, yOffset + 0, 
-                   xOffset + 30, yOffset + 0, 
-                   xOffset + 0, yOffset + 40, TFT_WHITE);
+  tft.fillTriangle(xOffset + 0 * scale, yOffset + 0 * scale, 
+                   xOffset + 30 * scale, yOffset + 0 * scale, 
+                   xOffset + 0 * scale, yOffset + 40 * scale, TFT_WHITE);
 
-  tft.fillTriangle(xOffset + 10, yOffset + 25, 
-                   xOffset + 30, yOffset + 25, 
-                   xOffset + 10, yOffset + 70, TFT_WHITE);
+  tft.fillTriangle(xOffset + 10 * scale, yOffset + 25 * scale, 
+                   xOffset + 30 * scale, yOffset + 25 * scale, 
+                   xOffset + 10 * scale, yOffset + 70 * scale, TFT_WHITE);
 
-  tft.fillTriangle(xOffset + 30, yOffset + 0, 
-                   xOffset + 13, yOffset + 40, 
-                   xOffset + 0, yOffset + 40, TFT_WHITE);
+  tft.fillTriangle(xOffset + 30 * scale, yOffset + 0 * scale, 
+                   xOffset + 13 * scale, yOffset + 40 * scale, 
+                   xOffset + 0 * scale, yOffset + 40 * scale, TFT_WHITE);
 
   // Draw rotated "LNbits" text on the left side
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.setTextColor(global.foregroundColor, global.backgroundColor);
   tft.setTextSize(3);
   tft.setTextDatum(MC_DATUM);
 
   tft.setRotation(0);
 
   // Draw "LN" in bold by overlaying text slightly offset
-  tft.setTextColor(TFT_WHITE);
+  tft.setTextColor(global.foregroundColor);
   
   tft.setCursor(12, 2);
   tft.print("L");
@@ -62,20 +66,22 @@ void displayLogoScreen() {
   tft.print("N");
 
   // Draw "bits" normal text next to "LN"
-  tft.setTextColor(TFT_WHITE);
+  tft.setTextColor(global.foregroundColor);
   tft.setCursor(60, 2);
   tft.print("bits");
 
   tft.setRotation(1);
 
   // Draw build version at bottom-right
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.setTextColor(global.foregroundColor, global.backgroundColor);
   tft.setTextSize(1);
 
-  int textWidth = tft.textWidth(env.version); // Get text width
-  int textX = 240 - textWidth - 2; 
-  int textY = 135 - 12;
-
+  // Dynamically calculate bottom-right position
+  int textWidth = tft.textWidth(env.version);
+  int textHeight = 8;
+  int textX = REAL_SCREEN_WIDTH - textWidth - 2; // 2-pixel margin
+  int textY = REAL_SCREEN_HEIGHT - textHeight - 2; // 2-pixel margin
+  
   tft.setCursor(textX, textY);
   tft.print(env.version);
 }
@@ -85,13 +91,13 @@ void showMessage(String message, String additional)
   global.onLogo = false;
   setDisplay(true);
 
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.fillScreen(global.backgroundColor);
+  tft.setTextColor(global.foregroundColor, global.backgroundColor);
   tft.setTextSize(2);
   tft.setCursor(0, 30);
   tft.println(message);
 
-  tft.setTextColor(TFT_LNBITS_PURPLE, TFT_BLACK);
+  tft.setTextColor(global.accentColor, global.backgroundColor);
   tft.setTextSize(2);
   tft.setCursor(0, 80);
   tft.println(additional);
@@ -146,10 +152,10 @@ void displayLoginScreen() {
   const int maxAttempts = 3;
 
   // Full screen clear
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(global.backgroundColor);
 
   while (true) {
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(global.foregroundColor, global.backgroundColor);
     tft.setTextSize(2);
     tft.setCursor(0, 10);
     tft.println("Enter PIN:");
@@ -168,13 +174,13 @@ void displayLoginScreen() {
     }
 
     tft.setTextSize(3);
-    tft.setTextColor(TFT_LNBITS_PURPLE, TFT_BLACK);
+    tft.setTextColor(global.accentColor, global.backgroundColor);
     tft.println(displayPin);
     tft.println("");
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(global.foregroundColor, global.backgroundColor);
     tft.setTextSize(2);
-    tft.setCursor(0, 90);
+    tft.setCursor(0, 100 * global.scaleFactor);
     tft.println("Top to cycle digit");
     tft.println("Bottom to confirm");
 
@@ -215,7 +221,7 @@ void displayLoginScreen() {
                 currentDigit = 0;
 
                 // Full screen clear
-                tft.fillScreen(TFT_BLACK);
+                tft.fillScreen(global.backgroundColor);
               }
             }
           }
@@ -236,10 +242,10 @@ void displaySetPinScreen() {
   unsigned long lastButtonPressTime = 0;
 
   // Full screen clear
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(global.backgroundColor);
 
   while (true) {
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(global.foregroundColor, global.backgroundColor);
     tft.setTextSize(2);
     tft.setCursor(0, 10);
     tft.println("Set New PIN:");
@@ -258,13 +264,13 @@ void displaySetPinScreen() {
     }
 
     tft.setTextSize(3);
-    tft.setTextColor(TFT_LNBITS_PURPLE, TFT_BLACK);
+    tft.setTextColor(global.accentColor, TFT_BLACK);
     tft.println(displayPin);
     tft.println("");
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(global.foregroundColor, global.backgroundColor);
     tft.setTextSize(2);
-    tft.setCursor(0, 90);
+    tft.setCursor(0, 100 * global.scaleFactor);
     tft.println("Top to cycle digit");
     tft.println("Bottom to confirm");
 

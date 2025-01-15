@@ -1,15 +1,15 @@
 /*
  Display all the fast rendering fonts in a sprite
 
- Make sure all the display driver and pin comnections are correct by
- editting the User_Setup.h file in the TFT_eSPI library folder.
+ Make sure all the display driver and pin connections are correct by
+ editing the User_Setup.h file in the TFT_eSPI library folder.
 
  #########################################################################
  ###### DON'T FORGET TO UPDATE THE User_Setup.h FILE IN THE LIBRARY ######
  #########################################################################
 */
 
-// Specify sprite 160 x 128 pixels (needs 40Kbytes of RAM for 16 bit colour)
+// Specify sprite 160 x 128 pixels (needs 40Kbytes of RAM for 16-bit colour)
 #define IWIDTH  160
 #define IHEIGHT 128
 

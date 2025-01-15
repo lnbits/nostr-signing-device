@@ -1,9 +1,9 @@
 /*
   This sketch uses Smooth fonts stored in FLASH program memory. It uses a method
-  for rendering anti-aliased fonts on an arbitrary background. This is acheived
+  for rendering anti-aliased fonts on an arbitrary background. This is achieved
   by reading the pixel color at each point on the screen. The TFT must support
   reading the graphics RAM of the screen memory. This sketch has been tested with
-  ILI9241 and ILI9481 serial and parallel screens.
+  ILI9341 and ILI9481 serial and parallel screens.
 
   The TFT_eSPI library must be given the name of the function in the sketch
   that will return the pixel color at a position x,y on the TFT. In this
@@ -83,7 +83,7 @@ unsigned int colour = red << 11; // Colour order is RGB 5+6+5 bits each
 
 void rainbow_fill()
 {
-  // The colours and state are not initialised so the start colour changes each time the funtion is called
+  // The colours and state are not initialised so the start colour changes each time the function is called
   
   for (int i = 319; i >= 0; i--) {
     // Draw a vertical line 1 pixel wide in the selected colour

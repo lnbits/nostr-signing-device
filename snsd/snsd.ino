@@ -11,13 +11,13 @@
 #include <TFT_eSPI.h>
 #include <Hash.h>
 #include <ArduinoJson.h>
-#include "Bitcoin.h"
-#include "qrcoded.h"
+#include <Bitcoin.h>
+#include <qrcoded.h>
 #include <aes.h>
-#include "bootloader_random.h"
+#include <bootloader_random.h>
 #include <vector>
 #include <gmp-ino.h>
-#include "mbedtls/base64.h"
+#include <mbedtls/base64.h>
 #include <map>
 
 fs::SPIFFSFS &FlashFS = SPIFFS;
@@ -25,10 +25,45 @@ fs::SPIFFSFS &FlashFS = SPIFFS;
 SHA256 h;
 TFT_eSPI tft = TFT_eSPI();
 
-// Pins
-#define button1PinNumber 0
-#define button2PinNumber 35
-#define backlightPinNumber 4
+/**
+  IMPORTANT: Notes for compiling
+
+  TTGO T-Display:
+    Board in Arduino IDE = TTGO LoRa32-OLED
+    TFT_eSPI = In User_Setup_Select.h uncomment - #include <User_Setups/Setup25_TTGO_T_Display.h>
+
+  Lilygo T-Display-S3
+    Board in Arduino IDE = ESP32S Dev Module
+    TFT_eSPI = In User_Setup_Select.h uncomment - #include <User_Setups/Setup206_LilyGo_T_Display_S3.h>
+
+  IMPORTANT: Ensure that SPIFFS partition scheme is used!
+*/
+
+// Set BOARD_TYPE to 1 (TTGO T-Display) or 2 (Lilygo T-Display-S3)
+#define BOARD_TYPE 1
+
+// Pin configuration
+#if BOARD_TYPE == 1
+  // TTGO T-Display
+  #define BTN_1_PIN 0
+  #define BTN_2_PIN 35
+  #define BACKLIGHT_PIN 4
+  #define REAL_SCREEN_WIDTH 240
+  #define REAL_SCREEN_HEIGHT 135
+#elif BOARD_TYPE == 2
+  // Lilygo T-Display-S3
+  #define BTN_1_PIN 0
+  #define BTN_2_PIN 14
+  #define BACKLIGHT_PIN 38
+  #define REAL_SCREEN_WIDTH 320
+  #define REAL_SCREEN_HEIGHT 170
+#else
+  #error "Unsupported BOARD_TYPE. Please set BOARD_TYPE to 1 (TTGO T-Display) or 2 (Lilygo T-Display-S3)."
+#endif
+
+// Used for UI scaling (do not amend)
+#define BASE_SCREEN_WIDTH 240
+#define BASE_SCREEN_HEIGHT 135
 
 // Colours
 #define TFT_LNBITS_PURPLE 0x63BA
@@ -62,6 +97,13 @@ struct GlobalState {
   String privateKeysFileName;
   String activeKeyIndexFileName;
   String legacyNostrSecretFileName;
+  float scaleFactor;
+  uint16_t accentColor;
+  String accentColorFileName;
+  bool darkMode;
+  uint16_t foregroundColor;
+  uint16_t backgroundColor;
+  String darkModeFileName;
 };
 
 // Note: this is not an endorsment for One World Goverment
@@ -70,9 +112,9 @@ GlobalState global = {
   "",
   "",
   millis(),
-  button1PinNumber,
-  button2PinNumber,
-  backlightPinNumber,
+  BTN_1_PIN,
+  BTN_2_PIN,
+  BACKLIGHT_PIN,
   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
   false,
   "",
@@ -91,7 +133,14 @@ GlobalState global = {
   "/pinattempts.txt",
   "/private_keys.txt",
   "/active_key_index.txt",
-  "/nostr-secret.txt"
+  "/nostr-secret.txt",
+  0,
+  TFT_LNBITS_PURPLE,
+  "/accent_color.txt",
+  true,
+  TFT_WHITE,
+  TFT_BLACK,
+  "/dark_mode.txt"
 };
 
 ////////////////////////////////           Global State End            ////////////////////////////////
@@ -102,7 +151,7 @@ struct EnvironmentVariables {
 };
 
 EnvironmentVariables env = {
-  "20241219.0938",
+  "20250109.1219",
 };
 ////////////////////////////////           Env Vars End            ////////////////////////////////
 

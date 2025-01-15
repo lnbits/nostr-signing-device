@@ -127,11 +127,18 @@ void generateRandomIV(uint8_t *iv, int length) {
 }
 
 String previewString(const String &input) {
-    if (input.length() <= 19) {
+    // Calculate the maximum number of characters that fit on the screen
+    int charWidth = REAL_SCREEN_WIDTH / 12;
+    int maxChars = charWidth;
+
+    if (input.length() <= maxChars) {
         return input;
     }
-    String firstPart = input.substring(0, 8);
-    String lastPart = input.substring(input.length() - 8);
+
+    // Calculate the truncation size dynamically
+    int truncationSize = (maxChars - 3) / 2; // Subtract 3 for "..." and divide remaining space
+    String firstPart = input.substring(0, truncationSize);
+    String lastPart = input.substring(input.length() - truncationSize);
     return firstPart + "..." + lastPart;
 }
 
@@ -211,4 +218,22 @@ void migrateKey() {
   deleteFile(SPIFFS, global.legacyNostrSecretFileName.c_str());
   logInfo("Private key migrated.");
   ESP.restart();
+}
+
+void displayToggleDarkMode() {
+  global.darkMode = !global.darkMode;
+  
+  if (global.darkMode) {
+    global.foregroundColor = TFT_WHITE;
+    global.backgroundColor = TFT_BLACK;
+  } else {
+    global.foregroundColor = TFT_BLACK;
+    global.backgroundColor = TFT_WHITE;
+  }
+  
+  // Save the dark mode setting
+  writeFile(SPIFFS, global.darkModeFileName.c_str(), global.darkMode ? "1" : "0");
+  
+  // Show confirmation message
+  showMessage("Display Mode", global.darkMode ? "Dark Mode" : "Light Mode");
 }

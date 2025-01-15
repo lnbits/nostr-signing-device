@@ -24,7 +24,7 @@
       0x03,                   //     3 lines back porch
       10,                     //     10 ms delay
     ST7735_MADCTL , 1      ,  //  5: Memory access ctrl (directions), 1 arg:
-      0x40,                   //     Row addr/col addr, bottom to top refresh
+      0x40 | TFT_MAD_COLOR_ORDER, //     Row addr/col addr, bottom to top refresh
     ST7735_DISSET5, 2      ,  //  6: Display settings #5, 2 args, no delay:
       0x15,                   //     1 clk cycle nonoverlap, 2 cycle gate
                               //     rise, 3 cycle osc equalize
@@ -101,7 +101,7 @@
       0x0E,
     ST7735_INVOFF , 0      ,  // 13: Don't invert display, no args, no delay
     ST7735_MADCTL , 1      ,  // 14: Memory access control (directions), 1 arg:
-      0xC8,                   //     row addr/col addr, bottom to top refresh
+      0xC0 | TFT_MAD_COLOR_ORDER, //     row addr/col addr, bottom to top refresh
     ST7735_COLMOD , 1      ,  // 15: set color mode, 1 arg, no delay:
       0x05 },                 //     16-bit color
 
@@ -122,6 +122,17 @@
     ST7735_RASET  , 4      ,  //  2: Row addr set, 4 args, no delay:
       0x00, 0x00,             //     XSTART = 0
       0x00, 0x9F },           //     XEND = 159
+
+  // Frame control init for RobotLCD, taken from https://github.com/arduino-libraries/TFT, Adafruit_ST7735.cpp l. 263, commit 61b8a7e
+  Rcmd3RobotLCD[] = {
+      3,
+      ST7735_FRMCTR1, 2    ,  //  1: Frame rate ctrl - normal mode, 2 args
+        0x0B, 0x14,
+      ST7735_FRMCTR2, 2    ,  //  2: Frame rate ctrl - idle mode, 2 args
+        0x0B, 0x14,
+      ST7735_FRMCTR3, 4    ,  //  3: Frame rate ctrl - partial mode, 4 args
+        0x0B, 0x14,
+        0x0B, 0x14 },
 
   Rcmd3[] = {                 // Init for 7735R, part 3 (red or green tab)
     4,                        //  4 commands in list:
@@ -146,7 +157,8 @@
      }
      else 
      {
-	  commandList(Rcmd1);
+	     commandList(Rcmd1);
+
        if (tabcolor == INITR_GREENTAB)
        {
          commandList(Rcmd2green);
@@ -157,7 +169,7 @@
        {
          commandList(Rcmd2green);
          writecommand(ST7735_MADCTL);
-         writedata(0xC0);
+         writedata(0xC0 | TFT_MAD_COLOR_ORDER);
          colstart = 2;
          rowstart = 1;
        }
@@ -180,6 +192,11 @@
          colstart = 26;
          rowstart = 1;
        }
+       else if (tabcolor == INITR_ROBOTLCD)
+       {
+         commandList(Rcmd2green);
+         commandList(Rcmd3RobotLCD);
+       }
        else if (tabcolor == INITR_REDTAB160x80)
        {
          commandList(Rcmd2green);
@@ -193,8 +210,9 @@
        else if (tabcolor == INITR_BLACKTAB)
        {
          writecommand(ST7735_MADCTL);
-         writedata(0xC0);
+         writedata(0xC0 | TFT_MAD_COLOR_ORDER);
        }
+
        commandList(Rcmd3);
      }
 }
