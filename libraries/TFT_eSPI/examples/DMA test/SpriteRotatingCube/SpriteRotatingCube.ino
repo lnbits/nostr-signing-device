@@ -2,7 +2,7 @@
 // https://en.wikipedia.org/wiki/Direct_memory_access
 
 // Tested with ESP32, Nucleo 64 STM32F446RE and Nucleo 144 STM32F767ZI
-// TFT's with SPI can use DMA, the sketch also works with 8 bit
+// TFT's with SPI can use DMA, the sketch also works with 8-bit
 // parallel TFT's (tested with ILI9341 and ILI9481)
 
 // The sketch will run on processors without DMA and also parallel
@@ -36,7 +36,7 @@
 // Color depth has to be 16 bits if DMA is used to render image
 #define COLOR_DEPTH 16
 
-// 128x128 for a 16 bit colour Sprite (32Kbytes RAM)
+// 128x128 for a 16-bit colour Sprite (32Kbytes RAM)
 // Maximum is 181x181 (64Kbytes) for DMA -  restricted by processor design
 #define IWIDTH  128
 #define IHEIGHT 128
@@ -56,7 +56,7 @@ TFT_eSprite spr[2] = {TFT_eSprite(&tft), TFT_eSprite(&tft) };
 // Toggle buffer selection
 bool sprSel = 0;
 
-// Pointers to start of Sprties in RAM
+// Pointers to start of Sprites in RAM
 uint16_t* sprPtr[2];
 
 // Define the cube face colors
@@ -305,7 +305,7 @@ void drawCube()
     p2y[i] = IHEIGHT / 2 + ay[i] * CUBE_SIZE / az[i];
   }
 
-  // Fill the buffer with color 0 (Black)
+  // Fill the buffer with colour 0 (Black)
   spr[sprSel].fillSprite(TFT_BLACK);
 
   for (int i = 0; i < 12; i++) {
@@ -353,7 +353,7 @@ void drawCube()
 uint32_t computePrimeNumbers(int32_t n) {
   if (n<2) return 1;
 
-  int32_t i, fact, j, p;
+  int32_t i, fact, j, p = 0;
 
   //Serial.print("\nPrime Numbers are: \n");
   for (i = 1; i <= n; i++)

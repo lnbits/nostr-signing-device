@@ -1,7 +1,7 @@
 
 // This is the command sequence that initialises the ILI9488 driver
 //
-// This setup information uses simple 8 bit SPI writecommand() and writedata() functions
+// This setup information uses simple 8-bit SPI writecommand() and writedata() functions
 //
 // See ST7735_Setup.h file for an alternative format
 
@@ -58,10 +58,10 @@
     writedata(0x48);          // MX, BGR
 
     writecommand(0x3A); // Pixel Interface Format
-#if defined (TFT_PARALLEL_8_BIT)
-    writedata(0x55);  // 16 bit colour for parallel
+#if defined (TFT_PARALLEL_8_BIT) || defined (TFT_PARALLEL_16_BIT) || defined (RPI_DISPLAY_TYPE)
+    writedata(0x55);  // 16-bit colour for parallel
 #else
-    writedata(0x66);  // 18 bit colour for SPI
+    writedata(0x66);  // 18-bit colour for SPI
 #endif
 
     writecommand(0xB0); // Interface Mode Control

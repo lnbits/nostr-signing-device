@@ -1,4 +1,5 @@
 // See SetupX_Template.h for all options available
+#define USER_SETUP_ID 9
 
 #define ST7735_DRIVER
 
@@ -9,9 +10,17 @@
 
 #define ST7735_REDTAB
 
+// For ST7735, ST7789 and ILI9341 ONLY, define the colour order IF the blue and red are swapped on your display
+// Try ONE option at a time to find the correct colour order for your display
+
+//  #define TFT_RGB_ORDER TFT_RGB  // Colour order Red-Green-Blue
+//  #define TFT_RGB_ORDER TFT_BGR  // Colour order Blue-Green-Red
+
 // Overlap mode shares the ESP8266 FLASH SPI bus with the TFT so has a performance impact
 // but saves pins for other functions. It is best not to connect MISO as some displays
-// do not tristate that line wjen chip select is high!
+// do not tristate that line when chip select is high!
+// Note: Only one SPI device can share the FLASH SPI lines, so a SPI touch controller
+// cannot be connected as well to the same SPI signals.
 // On NodeMCU 1.0 SD0=MISO, SD1=MOSI, CLK=SCLK to connect to TFT in overlap mode
 // On NodeMCU V3  S0 =MISO, S1 =MOSI, S2 =SCLK
 // In ESP8266 overlap mode the following must be defined

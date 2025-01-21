@@ -9,6 +9,9 @@
 #elif defined (SSD1963_800ALT_DRIVER)
   #define TFT_WIDTH  480
   #define TFT_HEIGHT 800
+#elif defined (SSD1963_800BD_DRIVER)
+  #define TFT_WIDTH  480
+  #define TFT_HEIGHT 800
 #endif
 
 //Set driver type common to all initialisation options
@@ -22,6 +25,12 @@
 // Generic commands used by TFT_eSPI.cpp
 #define TFT_NOP     0x00
 #define TFT_SWRST   0x01
+
+#define TFT_INVOFF  0x20
+#define TFT_INVON   0x21
+
+#define TFT_DISPOFF 0x28
+#define TFT_DISPON  0x29
 
 #define TFT_CASET   0x2A
 #define TFT_PASET   0x2B
@@ -48,6 +57,3 @@
 #else
   #define TFT_MAD_COLOR_ORDER TFT_MAD_BGR
 #endif
-
-#define TFT_INVOFF  0x20
-#define TFT_INVON   0x21

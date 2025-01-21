@@ -14,7 +14,9 @@ void menu() {
     {"Generate Key", menuNewKey},
     {"Remove Key", displayRemoveKeyScreen},
     {"Lock Device", displayLoginScreen},
-    {"Set/Change PIN", displaySetPinScreen},
+    {global.pinCode == "00000000" ? "Set PIN" : "Change PIN", displaySetPinScreen},
+    {"Change Color", displayColorSelectScreen},
+    {global.darkMode ? "Light Mode" : "Dark Mode", displayToggleDarkMode},
     {"Wipe Device", displayWipeDeviceScreen},
     {"Show Nsec QR Code", displayShowNsecQRCodeScreen},
     {"Back", menuReturn}
@@ -23,29 +25,32 @@ void menu() {
   int menuSize = sizeof(menuItems) / sizeof(MenuItem);
   int selectedIndex = 0;
 
-  // Show exactly 6 items at a time (indices 0 through 5)
+  // Dynamically calculate the number of items that can be displayed
+  int itemHeight = 20;
+  int maxVisibleItems = REAL_SCREEN_HEIGHT / itemHeight;
+
   int startIndex = 0;
-  int endIndex = 5;
+  int endIndex = maxVisibleItems - 1;
 
   unsigned long lastButton1Press = 0;
   unsigned long lastButton2Press = 0;
 
   // Full screen clear
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(global.backgroundColor);
 
   while (true) {
     // Draw the menu
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(global.foregroundColor, global.backgroundColor);
     tft.setTextSize(2);
     tft.setCursor(0, 10);
 
     for (int i = startIndex; i <= endIndex && i < menuSize; i++) {
-      tft.setCursor(0, (i - startIndex) * 20 + 10); // Adjust Y position based on visible range
+      tft.setCursor(0, (i - startIndex) * itemHeight + 10); // Adjust Y position based on visible range
       if (i == selectedIndex) {
-        tft.setTextColor(TFT_LNBITS_PURPLE, TFT_BLACK);
+        tft.setTextColor(global.accentColor, global.backgroundColor);
         tft.print("> ");
       } else {
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        tft.setTextColor(global.foregroundColor, global.backgroundColor);
         tft.print("  ");
       }
       tft.println(padRightWithSpaces(menuItems[i].name, 18));
@@ -72,7 +77,7 @@ void menu() {
             if (selectedIndex == 0) {
               // We reached beyond the last item and wrapped to top
               startIndex = 0;
-              endIndex = 5; 
+              endIndex = maxVisibleItems - 1;
             } else if (selectedIndex > endIndex) {
               // Shift the visible window down by one
               startIndex++;
@@ -81,13 +86,13 @@ void menu() {
               // If we somehow go beyond the last menu item, wrap back to top
               if (endIndex >= menuSize) {
                 startIndex = 0;
-                endIndex = 5;
+                endIndex = maxVisibleItems - 1;
               }
             }
 
-            // Ensure we always show exactly 6 items
-            if (endIndex - startIndex + 1 > 6) {
-              endIndex = startIndex + 5;
+            // Ensure we always show exactly maxVisibleItems
+            if (endIndex - startIndex + 1 > maxVisibleItems) {
+              endIndex = startIndex + maxVisibleItems - 1;
             }
           }
         } else if (buttonNumber == "1") { // Select the current option

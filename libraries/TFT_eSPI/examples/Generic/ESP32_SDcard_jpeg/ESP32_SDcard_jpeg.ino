@@ -36,7 +36,7 @@ void setup() {
 
   tft.begin();
 
-  if (!SD.begin()) {
+  if (!SD.begin(5, tft.getSPIinstance())) {
     Serial.println("Card Mount Failed");
     return;
   }
@@ -118,8 +118,8 @@ void drawSdJpeg(const char *filename, int xpos, int ypos) {
   Serial.println("===========================");
 
   // Use one of the following methods to initialise the decoder:
-  boolean decoded = JpegDec.decodeSdFile(jpegFile);  // Pass the SD file handle to the decoder,
-  //boolean decoded = JpegDec.decodeSdFile(filename);  // or pass the filename (String or character array)
+  bool decoded = JpegDec.decodeSdFile(jpegFile);  // Pass the SD file handle to the decoder,
+  //bool decoded = JpegDec.decodeSdFile(filename);  // or pass the filename (String or character array)
 
   if (decoded) {
     // print information about the image to the serial port
@@ -249,7 +249,7 @@ void jpegInfo() {
 // Show the execution time (optional)
 //####################################################################################################
 // WARNING: for UNO/AVR legacy reasons printing text to the screen with the Mega might not work for
-// sketch sizes greater than ~70KBytes because 16 bit address pointers are used in some libraries.
+// sketch sizes greater than ~70KBytes because 16-bit address pointers are used in some libraries.
 
 // The Due will work fine with the HX8357_Due library.
 

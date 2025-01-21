@@ -14,7 +14,7 @@
 
 // The rotation angle is in degrees, an angle of 0 means no Sprite rotation.
 
-// The pushRotated() function works with 1, 8 and 16 bit per pixel (bpp) Sprites.
+// The pushRotated() function works with 1, 8 and 16-bit per pixel (bpp) Sprites.
 
 // For 1 bpp Sprites the foreground and background colours are defined with the
 // member function setBitmapColor(foregroundColor, backgroundColor).
@@ -87,7 +87,7 @@ void loop() {
   // it is rotated and hence it clears the swept area to black
   for (int16_t angle = 0; angle <= 360; angle += 5)
   {
-    needle.pushRotated(angle); // Plot direct to TFT at specifed angle
+    needle.pushRotated(angle); // Plot direct to TFT at specified angle
     yield();                   // Avoid a watchdog time-out
   }
 }

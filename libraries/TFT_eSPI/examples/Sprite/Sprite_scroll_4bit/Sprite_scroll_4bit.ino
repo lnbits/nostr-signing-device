@@ -1,5 +1,5 @@
 /*
-  Sketch to show scrolling of the graphics in 4 bit sprites.
+  Sketch to show scrolling of the graphics in 4-bit sprites.
   Scrolling in this way moves the pixels in a defined rectangle
   within the Sprite. By default the whole sprite is scrolled.
   The gap left by scrolling is filled with a defined colour.
@@ -14,7 +14,7 @@
   any position. If there is sufficient RAM then the Sprite can
   be the same size as the screen and used as a frame buffer.
 
-  A 4 bit Sprite occupies (width * height)/2 bytes in RAM.
+  A 4-bit Sprite occupies (width * height)/2 bytes in RAM.
 */
 
 #include <TFT_eSPI.h>
@@ -41,7 +41,7 @@ void setup() {
   tft.init();
   tft.fillScreen(TFT_BLACK);
 
-  // Populate the palette table, table must have 16 entires
+  // Populate the palette table, table must have 16 entries
   palette[0]  = TFT_BLACK;
   palette[1]  = TFT_ORANGE;
   palette[2]  = TFT_DARKGREEN;

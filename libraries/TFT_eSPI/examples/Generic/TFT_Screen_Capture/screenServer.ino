@@ -2,8 +2,8 @@
 // over the serial port. Use a high baud rate, e.g. for an ESP8266:
 // Serial.begin(921600);
 
-// At 921600 baud a 320 x 240 image with 16 bit colour transfers can be sent to the
-// PC client in ~1.67s and 24 bit colour in ~2.5s which is close to the theoretical
+// At 921600 baud a 320 x 240 image with 16-bit colour transfers can be sent to the
+// PC client in ~1.67s and 24-bit colour in ~2.5s which is close to the theoretical
 // minimum transfer time.
 
 // This sketch has been created to work with the TFT_eSPI library here:
@@ -40,7 +40,7 @@
 
 // Number of pixels to send in a burst (minimum of 1), no benefit above 8
 // NPIXELS values and render times:
-// NPIXELS 1 = use readPixel() = >5s and 16 bit pixels only
+// NPIXELS 1 = use readPixel() = >5s and 16-bit pixels only
 // NPIXELS >1 using rectRead() 2 = 1.75s, 4 = 1.68s, 8 = 1.67s
 #define NPIXELS 8  // Must be integer division of both TFT width and TFT height
 
@@ -48,7 +48,7 @@
 //                           Screen server call with no filename
 //====================================================================================
 // Start a screen dump server (serial or network) - no filename specified
-boolean screenServer(void)
+bool screenServer(void)
 {
   // With no filename the screenshot will be saved with a default name e.g. tft_screen_#.xxx
   // where # is a number 0-9 and xxx is a file type specified below
@@ -59,12 +59,12 @@ boolean screenServer(void)
 //                           Screen server call with filename
 //====================================================================================
 // Start a screen dump server (serial or network) - filename specified
-boolean screenServer(String filename)
+bool screenServer(String filename)
 {
   delay(0); // Equivalent to yield() for ESP8266;
 
-  boolean result = serialScreenServer(filename); // Screenshot serial port server
-  //boolean result = wifiScreenServer(filename);   // Screenshot WiFi UDP port server (WIP)
+  bool result = serialScreenServer(filename); // Screenshot serial port server
+  //bool result = wifiScreenServer(filename);   // Screenshot WiFi UDP port server (WIP)
 
   delay(0); // Equivalent to yield()
 
@@ -78,13 +78,13 @@ boolean screenServer(String filename)
 //====================================================================================
 //                Serial server function that sends the data to the client
 //====================================================================================
-boolean serialScreenServer(String filename)
+bool serialScreenServer(String filename)
 {
   // Precautionary receive buffer garbage flush for 50ms
   uint32_t clearTime = millis() + 50;
   while ( millis() < clearTime && Serial.read() >= 0) delay(0); // Equivalent to yield() for ESP8266;
 
-  boolean wait = true;
+  bool wait = true;
   uint32_t lastCmdTime = millis();     // Initialise start of command time-out
 
   // Wait for the starting flag with a start time-out
@@ -104,7 +104,7 @@ boolean serialScreenServer(String filename)
         wait = false;           // No need to wait anymore
         lastCmdTime = millis(); // Set last received command time
 
-        // Send screen size etc using a simple header with delimiters for client checks
+        // Send screen size etc.using a simple header with delimiters for client checks
         sendParameters(filename);
       }
     }
@@ -169,7 +169,7 @@ boolean serialScreenServer(String filename)
 }
 
 //====================================================================================
-//    Send screen size etc using a simple header with delimiters for client checks
+//    Send screen size etc.using a simple header with delimiters for client checks
 //====================================================================================
 void sendParameters(String filename)
 {
@@ -183,7 +183,7 @@ void sendParameters(String filename)
 
   Serial.write('Y'); // Bits per pixel (16 or 24)
   if (NPIXELS > 1) Serial.write(BITS_PER_PIXEL);
-  else Serial.write(16); // readPixel() only provides 16 bit values
+  else Serial.write(16); // readPixel() only provides 16-bit values
 
   Serial.write('?'); // Filename next
   Serial.print(filename);

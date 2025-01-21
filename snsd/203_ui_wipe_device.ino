@@ -3,7 +3,7 @@ void displayWipeDeviceScreen() {
   setDisplay(true);
 
   // Full screen clear
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(global.backgroundColor);
 
   while (true) {
     // Draw the confirmation screen
@@ -12,9 +12,9 @@ void displayWipeDeviceScreen() {
     tft.setCursor(0, 10);
     tft.println("Do you want to wipe this device? All keys will be removed.");
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextColor(global.foregroundColor, global.backgroundColor);
     tft.setTextSize(2);
-    tft.setCursor(0, 90);
+    tft.setCursor(0, 100 * global.scaleFactor);
     tft.println("Top to confirm");
     tft.println("Bottom to cancel");
 
