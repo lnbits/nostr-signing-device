@@ -1,0 +1,9 @@
+{
+  "name": "snsd",
+  "devices": [
+    "esp32"
+  ],
+  "versions": [
+    "v0.2.0"
+  ]
+}
