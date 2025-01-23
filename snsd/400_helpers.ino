@@ -261,7 +261,7 @@ void displayToggleBLEMode() {
     showMessage("BLE Enabled", "Commands will be accepted over BLE only");
   } else {
     stopBLE();
-    Serial.begin(115200);  // Update to match new baud rate
+    Serial.begin(9600);
     Serial.setRxBufferSize(SERIAL_RX_BUFFER_SIZE);
     Serial.setTxBufferSize(SERIAL_TX_BUFFER_SIZE);
     showMessage("USB Enabled", "Commands will be accepted over USB only");

@@ -103,8 +103,7 @@ void setup() {
   if(global.bleMode) {
     setupBLE();
   } else {
-    // Initialize serial with higher baud rate
-    Serial.begin(115200);  // Change from 9600 to 115200
+    Serial.begin(9600);
     Serial.setRxBufferSize(SERIAL_RX_BUFFER_SIZE);
     Serial.setTxBufferSize(SERIAL_TX_BUFFER_SIZE);
   }
