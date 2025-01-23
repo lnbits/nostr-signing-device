@@ -7,6 +7,10 @@
    https://t.me/makerbits
 */
 
+// Increase serial buffer size (add before #include statements)
+#define SERIAL_RX_BUFFER_SIZE 1024
+#define SERIAL_TX_BUFFER_SIZE 1024
+
 #include <SPIFFS.h>
 #include <TFT_eSPI.h>
 #include <Hash.h>
@@ -19,6 +23,10 @@
 #include <gmp-ino.h>
 #include <mbedtls/base64.h>
 #include <map>
+
+#include <NimBLEDevice.h>
+#include <mbedtls/md.h>
+#include <mbedtls/chacha20.h>
 
 fs::SPIFFSFS &FlashFS = SPIFFS;
 
@@ -40,7 +48,7 @@ TFT_eSPI tft = TFT_eSPI();
 */
 
 // Set BOARD_TYPE to 1 (TTGO T-Display) or 2 (Lilygo T-Display-S3)
-#define BOARD_TYPE 1
+#define BOARD_TYPE 2
 
 // Pin configuration
 #if BOARD_TYPE == 1
@@ -50,6 +58,7 @@ TFT_eSPI tft = TFT_eSPI();
   #define BACKLIGHT_PIN 4
   #define REAL_SCREEN_WIDTH 240
   #define REAL_SCREEN_HEIGHT 135
+  #define LCD_POWER_ON_PIN -1
 #elif BOARD_TYPE == 2
   // Lilygo T-Display-S3
   #define BTN_1_PIN 0
@@ -57,6 +66,7 @@ TFT_eSPI tft = TFT_eSPI();
   #define BACKLIGHT_PIN 38
   #define REAL_SCREEN_WIDTH 320
   #define REAL_SCREEN_HEIGHT 170
+  #define LCD_POWER_ON_PIN 15
 #else
   #error "Unsupported BOARD_TYPE. Please set BOARD_TYPE to 1 (TTGO T-Display) or 2 (Lilygo T-Display-S3)."
 #endif
@@ -67,6 +77,8 @@ TFT_eSPI tft = TFT_eSPI();
 
 // Colours
 #define TFT_LNBITS_PURPLE 0x63BA
+
+#define BUTTON_PIN_BITMASK(GPIO) (1ULL << GPIO)  // 2 ^ GPIO_NUMBER in hex
 
 //////////////////////////////// Define and initialize the Global State ////////////////////////////////
 
@@ -104,6 +116,12 @@ struct GlobalState {
   uint16_t foregroundColor;
   uint16_t backgroundColor;
   String darkModeFileName;
+  bool bleMode;
+  String bleModeFileName;
+  bool colorSwap;
+  String colorSwapFileName;
+  bool tapToSign;
+  String tapToSignFileName;
 };
 
 // Note: this is not an endorsment for One World Goverment
@@ -140,7 +158,13 @@ GlobalState global = {
   true,
   TFT_WHITE,
   TFT_BLACK,
-  "/dark_mode.txt"
+  "/dark_mode.txt",
+  false,
+  "/ble_mode.txt",
+  false,
+  "/color_swap.txt",
+  true,
+  "/tap_to_sign.txt"
 };
 
 ////////////////////////////////           Global State End            ////////////////////////////////
@@ -151,7 +175,7 @@ struct EnvironmentVariables {
 };
 
 EnvironmentVariables env = {
-  "20250109.1219",
+  "20250123.0902-DEV",
 };
 ////////////////////////////////           Env Vars End            ////////////////////////////////
 
@@ -183,4 +207,8 @@ void logInfo(const String msg) {
   if(global.debug){
     Serial.println("/log " + msg);
   }
+}
+
+void printInfo(const String msg) {
+  Serial.println("/print " + msg);
 }

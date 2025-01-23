@@ -18,9 +18,44 @@ void loadDarkMode() {
   }
 }
 
+void loadBLEMode() {
+  FileData bleModeFile = readFile(SPIFFS, global.bleModeFileName.c_str());
+  if (bleModeFile.success) {
+    global.bleMode = (bleModeFile.data == "1");
+  } else {
+    global.bleMode = false; // Default to USB mode
+  }
+}
+
+void loadTapToSignMode() {
+  FileData tapToSignFile = readFile(SPIFFS, global.tapToSignFileName.c_str());
+  if (tapToSignFile.success) {
+    global.tapToSign = (tapToSignFile.data == "1");
+  } else {
+    global.tapToSign = true; // Default to Enabled
+  }
+}
+
+void loadColorSwap() {
+  FileData colorSwapFile = readFile(SPIFFS, global.colorSwapFileName.c_str());
+  if (colorSwapFile.success) {
+    global.colorSwap = (colorSwapFile.data == "1");
+  } else {
+    global.colorSwap = false; // Default to RGB
+  }
+}
+
 void setup() {
-  Serial.begin(9600);
   randomSeed(esp_random());
+
+  // Handle bottom button as wake from sleep
+  esp_sleep_enable_ext1_wakeup(BUTTON_PIN_BITMASK((gpio_num_t)BTN_1_PIN), (esp_sleep_ext1_wakeup_mode_t)0);
+
+  // Set LCD Power On PIN to high to enable running on battery
+  if(LCD_POWER_ON_PIN >= 0) {
+    pinMode(LCD_POWER_ON_PIN, OUTPUT);
+    digitalWrite(LCD_POWER_ON_PIN, HIGH);
+  }
 
   // Calculate scale factor for UI elements
   float scaleWidth = REAL_SCREEN_WIDTH / (float)BASE_SCREEN_WIDTH;
@@ -44,7 +79,11 @@ void setup() {
   // Load saved keys
   loadKeys();
   loadActiveKeyIndex();
+
+  // Load UI settings
+  loadColorSwap();
   loadAccentColor();
+  loadDarkMode();
 
   logInfo("NSD: waiting for commands");
 
@@ -53,8 +92,21 @@ void setup() {
     pinMode(global.button2Pin, INPUT_PULLUP);
   }
 
-  // Screen start up sequence
-  loadPIN();  
-  loadDarkMode();
+  // Load device settings
+  loadBLEMode();
+
+  if(global.bleMode) {
+    setupBLE();
+  } else {
+    // Initialize serial with higher baud rate
+    Serial.begin(115200);  // Change from 9600 to 115200
+    Serial.setRxBufferSize(SERIAL_RX_BUFFER_SIZE);
+    Serial.setTxBufferSize(SERIAL_TX_BUFFER_SIZE);
+  }
+
+  loadTapToSignMode();
+
+  // Display login screen if PIN is set, or go to logo
+  loadPIN();
   displayLoginScreen();
 }
