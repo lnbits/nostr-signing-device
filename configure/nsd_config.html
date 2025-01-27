@@ -124,8 +124,10 @@
                 <option value="/switch-key">/switch-key</option>
                 <option value="/new-key">/new-key</option>
                 <option value="/name-key">/name-key</option>
-                <option value="/encrypt-message">/encrypt-message</option>
-                <option value="/decrypt-message">/decrypt-message</option>
+                <option value="/encrypt-message-nip04">/encrypt-message-nip04</option>
+                <option value="/decrypt-message-nip04">/decrypt-message-nip04</option>
+                <option value="/encrypt-message-nip44">/encrypt-message-nip44</option>
+                <option value="/decrypt-message-nip44">/decrypt-message-nip44</option>
                 <option value="/reboot">/reboot</option>
                 <option value="/wipe">/wipe</option>
             </select>
@@ -229,16 +231,28 @@
                     <td>Set the name of a key. Blank removes the name.</td>
                 </tr>
                 <tr>
-                    <td>/encrypt-message</td>
+                    <td>/encrypt-message-nip04</td>
                     <td>3rd party public key in hex format</td>
                     <td>The message to encrypt</td>
                     <td>Encrypts the message on the device (NIP-04) and returns the encrypted message.</td>
                 </tr>
                 <tr>
-                    <td>/decrypt-message</td>
+                    <td>/decrypt-message-nip04</td>
                     <td>3rd party public key in hex format</td>
                     <td>The message to decrypt</td>
                     <td>Decrypts the message on the device (NIP-04) and returns the decrypted message.</td>
+                </tr>
+                <tr>
+                    <td>/encrypt-message-nip44</td>
+                    <td>3rd party public key in hex format</td>
+                    <td>The message to encrypt</td>
+                    <td>Encrypts the message on the device (NIP-44) and returns the encrypted message.</td>
+                </tr>
+                <tr>
+                    <td>/decrypt-message-nip44</td>
+                    <td>3rd party public key in hex format</td>
+                    <td>The message to decrypt</td>
+                    <td>Decrypts the message on the device (NIP-44) and returns the decrypted message.</td>
                 </tr>
                 <tr>
                     <td>/reboot</td>

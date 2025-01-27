@@ -237,3 +237,65 @@ void displayToggleDarkMode() {
   // Show confirmation message
   showMessage("Display Mode", global.darkMode ? "Dark Mode" : "Light Mode");
 }
+
+void displayToggleColorSwap() {
+  global.colorSwap = !global.colorSwap;
+
+  // Save the color swap setting
+  writeFile(SPIFFS, global.colorSwapFileName.c_str(), global.colorSwap ? "1" : "0");
+
+  // Reload accent color
+  loadColorSwap();
+  loadAccentColor();
+  
+  // Show confirmation message
+  showMessage("Color Swap", global.colorSwap ? "Set to BGR" : "Set to RGB");
+}
+
+void displayToggleBLEMode() {
+  global.bleMode = !global.bleMode;
+  writeFile(SPIFFS, global.bleModeFileName.c_str(), global.bleMode ? "1" : "0");
+  
+  if (global.bleMode) {
+    setupBLE();
+    showMessage("BLE Enabled", "Commands will be accepted over BLE only");
+  } else {
+    stopBLE();
+    Serial.begin(9600);
+    Serial.setRxBufferSize(SERIAL_RX_BUFFER_SIZE);
+    Serial.setTxBufferSize(SERIAL_TX_BUFFER_SIZE);
+    showMessage("USB Enabled", "Commands will be accepted over USB only");
+  }
+}
+
+void displayToggleTapToSign() {
+  global.tapToSign = !global.tapToSign;
+
+  // Save the color swap setting
+  writeFile(SPIFFS, global.tapToSignFileName.c_str(), global.tapToSign ? "1" : "0");
+  
+  // Show confirmation message
+  showMessage("Tap to Sign", global.tapToSign ? "Tap to Sign enabled" : "Tap to Sign disabled");
+}
+
+// Helper function to manage color order
+uint16_t setColor(uint16_t color, bool swap) {
+  if(swap) {
+    color = convertRGBtoBGR(color);
+  }
+
+  return color;
+}
+
+// Helper function to convert RGB to BGR
+uint16_t convertRGBtoBGR(uint16_t rgbColor) {
+  // Extract the red, green, and blue components
+  uint8_t red = (rgbColor >> 11) & 0x1F;   // Extract top 5 bits for red
+  uint8_t green = (rgbColor >> 5) & 0x3F;  // Extract middle 6 bits for green
+  uint8_t blue = rgbColor & 0x1F;          // Extract bottom 5 bits for blue
+
+  // Rearrange to BGR format
+  uint16_t bgrColor = (blue << 11) | (green << 5) | red;
+
+  return bgrColor;
+}

@@ -72,7 +72,7 @@ void showQRCode(String s, bool isPrivate) {
   int colour = TFT_BLACK;
   
   if(isPrivate) {
-    colour = TFT_RED;
+    colour = setColor(TFT_RED, global.colorSwap);
   }
 
   tft.fillScreen(colour);

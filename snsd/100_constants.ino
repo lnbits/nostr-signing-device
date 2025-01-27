@@ -17,8 +17,11 @@ const String COMMAND_SWITCH_KEY = "/switch-key";
 const String COMMAND_NEW_KEY = "/new-key";
 const String COMMAND_NAME_KEY = "/name-key";
 
-const String COMMAND_ENCRYPT_MESSAGE = "/encrypt-message";
-const String COMMAND_DECRYPT_MESSAGE = "/decrypt-message";
+const String COMMAND_ENCRYPT_MESSAGE_NIP04 = "/encrypt-message-nip04";
+const String COMMAND_DECRYPT_MESSAGE_NIP04 = "/decrypt-message-nip04";
+
+const String COMMAND_ENCRYPT_MESSAGE_NIP44 = "/encrypt-message-nip44";
+const String COMMAND_DECRYPT_MESSAGE_NIP44 = "/decrypt-message-nip44";
 
 const String COMMAND_REBOOT = "/reboot";
 const String COMMAND_WIPE = "/wipe";

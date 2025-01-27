@@ -1,51 +1,88 @@
-void menu() {
-  global.onLogo = false;
-  setDisplay(true);
+// Forward declarations
+struct MenuItem;
+void displayMenu(MenuItem* menuItems, int menuSize, String title);
 
-  // Define menu items and their associated actions
-  struct MenuItem {
-    String name;
-    void (*action)();
-  };
+// Define menu item structure
+struct MenuItem {
+  String name;
+  void (*action)();
+  MenuItem* subMenu;
+  int subMenuSize;
+};
 
-  MenuItem menuItems[] = {
-    {"Show Npub QR Code", displayShowNpubQRCodeScreen},
-    {"Switch Key", displaySwitchKeyScreen},
-    {"Generate Key", menuNewKey},
-    {"Remove Key", displayRemoveKeyScreen},
-    {"Lock Device", displayLoginScreen},
-    {global.pinCode == "00000000" ? "Set PIN" : "Change PIN", displaySetPinScreen},
-    {"Change Color", displayColorSelectScreen},
-    {global.darkMode ? "Light Mode" : "Dark Mode", displayToggleDarkMode},
-    {"Wipe Device", displayWipeDeviceScreen},
-    {"Show Nsec QR Code", displayShowNsecQRCodeScreen},
-    {"Back", menuReturn}
-  };
+// Define menu sizes
+const int MAIN_MENU_SIZE = 5;
+const int KEY_MANAGEMENT_MENU_SIZE = 6;
+const int UI_CONFIG_MENU_SIZE = 4;
+const int DEVICE_CONFIG_MENU_SIZE = 6;
 
-  int menuSize = sizeof(menuItems) / sizeof(MenuItem);
+// Sub-menu definitions
+MenuItem keyManagementMenu[KEY_MANAGEMENT_MENU_SIZE] = {
+  {"Show Npub QR Code", displayShowNpubQRCodeScreen, nullptr, 0},
+  {"Switch Key", displaySwitchKeyScreen, nullptr, 0},
+  {"Generate Key", menuNewKey, nullptr, 0},
+  {"Remove Key", displayRemoveKeyScreen, nullptr, 0},
+  {"Show Nsec QR Code", displayShowNsecQRCodeScreen, nullptr, 0},
+  {"Back", menuReturn, nullptr, 0}
+};
+
+MenuItem uiConfigMenu[UI_CONFIG_MENU_SIZE] = {
+  {"Change Color", displayColorSelectScreen, nullptr, 0},
+  {"", displayToggleDarkMode, nullptr, 0}, // Name will be set dynamically
+  {"", displayToggleColorSwap, nullptr, 0}, // Name will be set dynamically
+  {"Back", menuReturn, nullptr, 0}
+};
+
+MenuItem deviceConfigMenu[DEVICE_CONFIG_MENU_SIZE] = {
+  {"", displayToggleBLEMode, nullptr, 0}, // Name will be set dynamically
+  {"Lock Device", displayLoginScreen, nullptr, 0},
+  {"", displaySetPinScreen, nullptr, 0}, // Name will be set dynamically
+  {"Wipe Device", displayWipeDeviceScreen, nullptr, 0},
+  {"", displayToggleTapToSign, nullptr, 0}, // Name will be set dynamically
+  {"Back", menuReturn, nullptr, 0}
+};
+
+// Main menu definition
+MenuItem mainMenu[MAIN_MENU_SIZE] = {
+  {"Key Management", nullptr, keyManagementMenu, KEY_MANAGEMENT_MENU_SIZE},
+  {"UI Config", nullptr, uiConfigMenu, UI_CONFIG_MENU_SIZE},
+  {"Device Config", nullptr, deviceConfigMenu, DEVICE_CONFIG_MENU_SIZE},
+  {"Sleep", esp_deep_sleep_start, nullptr, 0},
+  {"Back", menuReturn, nullptr, 0}
+};
+
+// Helper function to display a menu
+void displayMenu(MenuItem* menuItems, int menuSize, String title) {
   int selectedIndex = 0;
-
-  // Dynamically calculate the number of items that can be displayed
   int itemHeight = 20;
   int maxVisibleItems = REAL_SCREEN_HEIGHT / itemHeight;
-
   int startIndex = 0;
-  int endIndex = maxVisibleItems - 1;
-
+  int endIndex = maxVisibleItems - 2;
   unsigned long lastButton1Press = 0;
   unsigned long lastButton2Press = 0;
 
-  // Full screen clear
+  // Update dynamic menu items
+  if (menuItems == uiConfigMenu) {
+    menuItems[1].name = global.darkMode ? "Set Light Mode" : "Set Dark Mode";
+    menuItems[2].name = global.colorSwap ? "Set RGB Mode" : "Set BGR Mode";
+  } else if (menuItems == deviceConfigMenu) {
+    menuItems[0].name = global.bleMode ? "Enable USB" : "Enable BLE";
+    menuItems[2].name = global.pinCode == "00000000" ? "Set PIN" : "Change PIN";
+    menuItems[4].name = global.tapToSign ? "Disable Tap to Sign" : "Enable Tap to Sign";
+  }
+
   tft.fillScreen(global.backgroundColor);
 
   while (true) {
-    // Draw the menu
-    tft.setTextColor(global.foregroundColor, global.backgroundColor);
+    // Draw the menu title
+    tft.setTextColor(global.accentColor, global.backgroundColor);
     tft.setTextSize(2);
     tft.setCursor(0, 10);
+    tft.println(title);
 
+    // Draw menu items
     for (int i = startIndex; i <= endIndex && i < menuSize; i++) {
-      tft.setCursor(0, (i - startIndex) * itemHeight + 10); // Adjust Y position based on visible range
+      tft.setCursor(0, (i - startIndex) * itemHeight + 35); // Increased Y offset for title
       if (i == selectedIndex) {
         tft.setTextColor(global.accentColor, global.backgroundColor);
         tft.print("> ");
@@ -56,7 +93,6 @@ void menu() {
       tft.println(padRightWithSpaces(menuItems[i].name, 18));
     }
 
-    // Wait for button event
     EventData event = awaitEvent();
 
     if (event.type == EVENT_BUTTON_ACTION) {
@@ -77,7 +113,7 @@ void menu() {
             if (selectedIndex == 0) {
               // We reached beyond the last item and wrapped to top
               startIndex = 0;
-              endIndex = maxVisibleItems - 1;
+              endIndex = maxVisibleItems - 2;
             } else if (selectedIndex > endIndex) {
               // Shift the visible window down by one
               startIndex++;
@@ -86,25 +122,44 @@ void menu() {
               // If we somehow go beyond the last menu item, wrap back to top
               if (endIndex >= menuSize) {
                 startIndex = 0;
-                endIndex = maxVisibleItems - 1;
+                endIndex = maxVisibleItems - 2;
               }
             }
 
-            // Ensure we always show exactly maxVisibleItems
-            if (endIndex - startIndex + 1 > maxVisibleItems) {
-              endIndex = startIndex + maxVisibleItems - 1;
+            // Ensure we always show exactly maxVisibleItems (adjusting for header)
+            if (endIndex - startIndex + 2 > maxVisibleItems) {
+              endIndex = startIndex + maxVisibleItems - 2;
             }
           }
         } else if (buttonNumber == "1") { // Select the current option
           if (currentMillis - lastButton1Press > global.debounceDelay) {
             lastButton1Press = currentMillis;
-            menuItems[selectedIndex].action(); // Trigger the associated action
-            return; // Exit menu after action is performed
+            MenuItem selectedItem = menuItems[selectedIndex];
+            
+            if (selectedItem.subMenu != nullptr) {
+              displayMenu(selectedItem.subMenu, selectedItem.subMenuSize, selectedItem.name);
+              tft.fillScreen(global.backgroundColor); // Clear screen after returning
+            } else {
+              selectedItem.action();
+              if (selectedItem.action != menuReturn) {
+                return; // Return to previous menu after action
+              }
+              return; // Exit this menu level
+            }
           }
         }
       }
+    } else if (event.type == EVENT_SCREEN_IDLE) {
+      return;
     }
   }
+}
+
+// Main menu function
+void menu() {
+  global.onLogo = false;
+  setDisplay(true);
+  displayMenu(mainMenu, MAIN_MENU_SIZE, "Main Menu");
 }
 
 // Menu helpers
