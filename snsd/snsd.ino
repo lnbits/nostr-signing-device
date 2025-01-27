@@ -175,7 +175,7 @@ struct EnvironmentVariables {
 };
 
 EnvironmentVariables env = {
-  "20250123.0902-DEV",
+  "20250123.0902",
 };
 ////////////////////////////////           Env Vars End            ////////////////////////////////
 
