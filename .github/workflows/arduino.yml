@@ -32,6 +32,8 @@ jobs:
           libraries: |
             - name: ArduinoJson
             - name: uBitcoin
+            - name: Base64
+            - name: gmp-ino
             - source-path: ./libraries/TFT_eSPI
             - source-path: ./libraries/QRCode
             - source-path: ./libraries/tiny-AES-c
