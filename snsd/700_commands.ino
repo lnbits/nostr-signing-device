@@ -72,11 +72,17 @@ CommandResponse executeCommand(Command c) {
   if (c.cmd == COMMAND_NAME_KEY)
     return executeNameKey(c.data);
 
-  if (c.cmd == COMMAND_ENCRYPT_MESSAGE)
-    return executeEncryptMessage(c.data);
+  if (c.cmd == COMMAND_ENCRYPT_MESSAGE_NIP04)
+    return executeEncryptMessageNip04(c.data);
 
-  if (c.cmd == COMMAND_DECRYPT_MESSAGE)
-    return executeDecryptMessage(c.data);
+  if (c.cmd == COMMAND_DECRYPT_MESSAGE_NIP04)
+    return executeDecryptMessageNip04(c.data);
+
+  if (c.cmd == COMMAND_ENCRYPT_MESSAGE_NIP44)
+    return executeEncryptMessageNip44(c.data);
+
+  if (c.cmd == COMMAND_DECRYPT_MESSAGE_NIP44)
+    return executeDecryptMessageNip44(c.data);
 
   if (c.cmd == COMMAND_REBOOT)
     return executeReboot(c.data);
@@ -88,7 +94,12 @@ CommandResponse executeCommand(Command c) {
 }
 
 void sendCommandOutput(String command, String commandData) {
-  Serial.println(command + " " + commandData);
+  String output = command + " " + commandData;
+  if(global.bleMode) {
+    sendBLEResponse(output);
+  } else {
+    Serial.println(output);
+  }
 }
 
 void savePIN(String pinCode) {

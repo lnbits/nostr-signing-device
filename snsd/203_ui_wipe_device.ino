@@ -7,7 +7,7 @@ void displayWipeDeviceScreen() {
 
   while (true) {
     // Draw the confirmation screen
-    tft.setTextColor(TFT_RED, TFT_BLACK);
+    tft.setTextColor(setColor(TFT_RED, global.colorSwap), TFT_BLACK);
     tft.setTextSize(2);
     tft.setCursor(0, 10);
     tft.println("Do you want to wipe this device? All keys will be removed.");

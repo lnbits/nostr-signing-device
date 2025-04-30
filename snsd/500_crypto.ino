@@ -89,7 +89,7 @@ String reconstructPublicKey(const String &xHex) {
 }
 
 // Encrypt a direct message
-String encryptDirectMessageContent(const String &sharedSecretHex, const String &text) {
+String encryptDirectMessageContentNip04(const String &sharedSecretHex, const String &text) {
     // Convert shared secret from hex to binary
     uint8_t sharedSecret[32];
     fromHex(sharedSecretHex, sharedSecret, 32);
@@ -132,7 +132,7 @@ String encryptDirectMessageContent(const String &sharedSecretHex, const String &
     return encryptedContent;
 }
 
-String decryptDirectMessageContent(const String &sharedSecretHex, const String &encryptedContent) {
+String decryptDirectMessageContentNip04(const String &sharedSecretHex, const String &encryptedContent) {
     // Find the separator between ciphertext and IV
     int separatorIndex = encryptedContent.indexOf("?iv=");
     if (separatorIndex == -1) {

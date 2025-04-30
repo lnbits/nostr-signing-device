@@ -7,7 +7,12 @@ EventData awaitEvent() {
   if (global.hasCommandsFile == true) {
     return awaitFileEvent();
   }
-  return awaitSerialEvent();
+  if (!global.bleMode) {
+    return awaitSerialEvent();
+  }
+  if (global.bleMode) {
+    return awaitBLESerialEvent();
+  }
 }
 
 EventData awaitFileEvent() {
@@ -63,8 +68,50 @@ EventData awaitSerialEvent() {
     }
 
   }
+
   String data = Serial.readStringUntil('\n');
   return { EVENT_SERIAL_DATA, data };
+}
+
+EventData awaitBLESerialEvent() {
+  unsigned long waitTime = millis();
+  while (true) {
+    // Check for queued BLE commands
+    String command = dequeueBLECommand();
+    if (command.length() > 0) {
+      return { EVENT_SERIAL_DATA, command };
+    }
+
+    if ((millis() - waitTime) > global.screenTimeout * 1000) {
+      waitTime = millis();
+      if(global.unlocked) {
+        return {EVENT_SCREEN_IDLE,""};
+      }
+    }
+
+    EventData buttonEvent = checkButtonsState();
+
+    // Handle button presses on the menu screen
+    if (buttonEvent.type == EVENT_BUTTON_ACTION && global.onLogo) {
+      String buttonNumber = getWordAtPosition(buttonEvent.data, 0);
+      String buttonState = getWordAtPosition(buttonEvent.data, 1);
+
+      if (buttonState == "1") {
+        if (buttonNumber == "2") {
+          menu();
+          displayLogoScreen();
+        } else if (buttonNumber == "1") {
+          toggleDisplay();
+        }
+      }
+    } else if (buttonEvent.type == EVENT_BUTTON_ACTION) {
+      setDisplay(true);
+      // Return other button presses
+      return buttonEvent;
+    }
+
+    delay(10); // Give other tasks a chance to run
+  }
 }
 
 unsigned long lastDebounceTime1 = 0;

@@ -84,6 +84,24 @@ void displayLogoScreen() {
   
   tft.setCursor(textX, textY);
   tft.print(env.version);
+
+  // Status bar at top-right postion
+  String status = "";
+  int statusWidth = 0;
+  int statusX = 0;
+  
+  if (global.bleMode) {
+    status = "BLE  " + getDeviceId();
+    statusWidth = tft.textWidth(status);
+    statusX = REAL_SCREEN_WIDTH - statusWidth - 2;
+  } else {
+    status = "USB            ";
+    statusWidth = tft.textWidth(status);
+    statusX = REAL_SCREEN_WIDTH - statusWidth - 2;
+  }
+
+  tft.setCursor(statusX, 2);  // 2 pixels from top
+  tft.print(status);
 }
 
 void showMessage(String message, String additional)

@@ -52,7 +52,7 @@ void displayColorSelectScreen() {
         tft.println("");
         
         // Show color name in its own color
-        tft.setTextColor(colorOptions[selectedIndex].value, global.backgroundColor);
+        tft.setTextColor(setColor(colorOptions[selectedIndex].value, global.colorSwap), global.backgroundColor);
         tft.println(padRightWithSpaces(colorOptions[selectedIndex].name, 20));
         tft.println("");
 
@@ -78,6 +78,7 @@ void displayColorSelectScreen() {
                 } else if (buttonNumber == "1") {
                     global.accentColor = colorOptions[selectedIndex].value;
                     saveAccentColor();
+                    global.accentColor = setColor(global.accentColor, global.colorSwap);
                     showMessage("Color Selected", colorOptions[selectedIndex].name);
                     return;
                 }
@@ -96,6 +97,8 @@ void saveAccentColor() {
 void loadAccentColor() {
     FileData colorFile = readFile(SPIFFS, global.accentColorFileName.c_str());
     if (colorFile.success) {
-        global.accentColor = colorFile.data.toInt();
+        global.accentColor = setColor(colorFile.data.toInt(), global.colorSwap);
+    } else {
+        global.accentColor = setColor(global.accentColor, global.colorSwap);
     }
 } 
