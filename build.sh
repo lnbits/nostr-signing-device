@@ -6,6 +6,8 @@ arduino-cli upgrade
 arduino-cli core install esp32:esp32@2.0.17
 arduino-cli lib install ArduinoJson uBitcoin Base64 gmp-ino
 arduino-cli compile \
+    --build-property "build.partitions=min_spiffs" \
+    --build-property "upload.maximum_size=1966080" \
     --library ./libraries/TFT_eSPI \
     --library ./libraries/QRCode \
     --library ./libraries/tiny-AES-c \
