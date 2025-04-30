@@ -38,6 +38,7 @@ jobs:
             - name: uBitcoin
             - name: Base64
             - name: gmp-ino
+            - name: NimBLE-Arduino
             - source-path: ./libraries/TFT_eSPI
             - source-path: ./libraries/QRCode
             - source-path: ./libraries/tiny-AES-c
