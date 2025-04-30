@@ -16,27 +16,26 @@ jobs:
           #- esp32:esp32:esp32h2
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: arduino/compile-sketches@v1
         with:
           enable-deltas-report: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           fqbn: ${{ matrix.fqbn }}
           platforms: |
-            - name: esp32:esp32
+            - name: esp32:esp32@2.0.17
               source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
           sketch-paths: |
-            - snsd
+            - snsd/snsd.ino
           cli-compile-flags: |
             - --warnings="none"
           libraries: |
             - name: ArduinoJson
-            - name: QRCode
-            - name: TFT_eSPI
             - name: uBitcoin
-            # - name: tiny-AES-c
+            - source-path: ./libraries/TFT_eSPI
+            - source-path: ./libraries/QRCode
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: sketches-reports
           path: sketches-reports
@@ -49,7 +48,7 @@ jobs:
     steps:
       # This step is needed to get the size data produced by the compile jobs
       - name: Download sketches reports artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: sketches-reports
           path: sketches-reports
