@@ -7,7 +7,7 @@ void loadDarkMode() {
   } else {
     global.darkMode = true; // Default to dark mode
   }
-  
+
   // Set colors based on mode
   if (global.darkMode) {
     global.foregroundColor = TFT_WHITE;
@@ -32,9 +32,14 @@ void setup() {
   tft.setRotation(1);
   tft.invertDisplay(true);
 
+  showMessage("Booting...", "please wait");
+
   h.begin();
   FlashFS.begin(FORMAT_ON_FAIL);
   SPIFFS.begin(true);
+
+  // Full screen clear
+  tft.fillScreen(global.backgroundColor);
 
   // Migrate from single key to multi key
   if(SPIFFS.exists(global.legacyNostrSecretFileName.c_str())) {
@@ -54,7 +59,7 @@ void setup() {
   }
 
   // Screen start up sequence
-  loadPIN();  
+  loadPIN();
   loadDarkMode();
   displayLoginScreen();
 }
