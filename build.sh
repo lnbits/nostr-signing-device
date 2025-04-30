@@ -8,4 +8,5 @@ arduino-cli lib install ArduinoJson QRCode TFT_eSPI uBitcoin
 arduino-cli compile \
     --library ./libraries/TFT_eSPI \
     --library ./libraries/QRCode \
+    --library ./libraries/tiny-AES-c \
     --build-path build --fqbn esp32:esp32:esp32 snsd

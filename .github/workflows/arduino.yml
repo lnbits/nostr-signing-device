@@ -34,6 +34,7 @@ jobs:
             - name: uBitcoin
             - source-path: ./libraries/TFT_eSPI
             - source-path: ./libraries/QRCode
+            - source-path: ./libraries/tiny-AES-c
 
       - uses: actions/upload-artifact@v4
         with:

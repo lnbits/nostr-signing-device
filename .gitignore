@@ -3,6 +3,7 @@ installer/main_assets
 installer/firmware
 .pio
 .vscode
+.cache
 dist
 build/*
 !build/manifest.template.json
