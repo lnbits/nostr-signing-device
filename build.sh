@@ -1,14 +1,16 @@
-command -v arduino-cli >/dev/null 2>&1 || { echo >&2 "arduino-cli not found. Aborting."; exit 1; }
-arduino-cli config --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json init
-arduino-cli core update-index
-arduino-cli upgrade
-# uBitcoin is broken on esp32 3.x.x
-arduino-cli core install esp32:esp32@2.0.17
-arduino-cli lib install ArduinoJson uBitcoin Base64 gmp-ino
+#!/bin/sh
+if [ -z "$1" ]; then
+    echo "Usage: sh build.sh <device>"
+    echo "tdisplay is the default device"
+    exit 1
+fi
+uppercase=$(echo $1 | tr '[:lower:]' '[:upper:]')
+tft_config=$(sh ./tft_build_flags.sh)
 arduino-cli compile \
     --build-property "build.partitions=min_spiffs" \
     --build-property "upload.maximum_size=1966080" \
-    --library ./libraries/TFT_eSPI \
+    --build-property "build.extra_flags.esp32=${tft_config} -D${uppercase}" \
     --library ./libraries/QRCode \
-    --library ./libraries/tiny-AES-c \
-    --build-path build --fqbn esp32:esp32:esp32 snsd
+    --build-path build \
+    --fqbn esp32:esp32:ttgo-lora32 snsd
+    # - source-path: ./libraries/tiny-AES-c

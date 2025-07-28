@@ -1,7 +1,7 @@
 {
   "name": "snsd",
   "devices": [
-    "esp32"
+    "tdisplay"
   ],
   "versions": [
     "v0.2.0"
