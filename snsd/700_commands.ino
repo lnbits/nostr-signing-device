@@ -68,7 +68,7 @@ CommandResponse executeCommand(Command c) {
 
   if (c.cmd == COMMAND_NEW_KEY)
     return executeNewKey(c.data);
-  
+
   if (c.cmd == COMMAND_NAME_KEY)
     return executeNameKey(c.data);
 
@@ -92,12 +92,12 @@ void sendCommandOutput(String command, String commandData) {
 }
 
 void savePIN(String pinCode) {
-  writeFile(SPIFFS, global.pinFileName.c_str(), pinCode);
+  writeFile(SPIFFS, FILE_PIN, pinCode);
 }
 
 void loadPIN() {
   // Load the expected PIN number
-  FileData pinFile = readFile(SPIFFS, global.pinFileName.c_str());
+  FileData pinFile = readFile(SPIFFS, FILE_PIN);
   if (pinFile.success) {
     global.pinCode = pinFile.data;
   } else {
@@ -106,7 +106,7 @@ void loadPIN() {
   }
 
   // Load the PIN attempts
-  FileData attemptsFile = readFile(SPIFFS, global.pinAttemptsFileName.c_str());
+  FileData attemptsFile = readFile(SPIFFS, FILE_PIN);
   if (attemptsFile.success) {
     global.pinAttempts = attemptsFile.data.toInt();
   } else {

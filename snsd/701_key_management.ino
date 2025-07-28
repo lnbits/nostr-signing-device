@@ -9,7 +9,7 @@ CommandResponse executeRestore(String privateKey) {
     showMessage("Restore Key", "Invalid private key hex.");
     return {"", ""};
   }
-  
+
   // Check if the key already exists
   for (const String& existingKey : global.privateKeys) {
     if (existingKey == privateKey) {
@@ -22,7 +22,8 @@ CommandResponse executeRestore(String privateKey) {
   global.privateKeys.push_back(privateKey);
   saveKeys();
 
-  Serial.println(COMMAND_RESTORE + " 0 ");
+  Serial.print(COMMAND_RESTORE);
+  Serial.println(" 0 ");
 
   showMessage("Key Added", "Total: " + String(global.privateKeys.size()));
   return {"Key Added", "Total: " + String(global.privateKeys.size())};
@@ -49,7 +50,8 @@ CommandResponse executeAddKey(String privateKey) {
   global.privateKeys.push_back(privateKey);
   saveKeys();
 
-  Serial.println(COMMAND_ADD_KEY + " 0 ");
+  Serial.print(COMMAND_ADD_KEY);
+  Serial.println(" 0 ");
 
   showMessage("Key Added", "Total: " + String(global.privateKeys.size()));
   return {"Key Added", "Total: " + String(global.privateKeys.size())};
@@ -68,7 +70,8 @@ CommandResponse executeRemoveKey(String indexStr) {
   }
   saveKeys();
 
-  Serial.println(COMMAND_REMOVE_KEY + " 0 ");
+  Serial.print(COMMAND_REMOVE_KEY);
+  Serial.println(" 0 ");
 
   showMessage("Key Removed", "Total: " + String(global.privateKeys.size()));
   return {"Key Removed", "Total: " + String(global.privateKeys.size())};
@@ -92,7 +95,8 @@ CommandResponse executeSwitchKey(String indexStr) {
   global.activeKeyIndex = index;
   saveActiveKeyIndex();
 
-  Serial.println(COMMAND_SWITCH_KEY + " 0 ");
+  Serial.print(COMMAND_SWITCH_KEY);
+  Serial.println(" 0 ");
 
   showMessage("Key Selected", "Index: " + String(index));
   return {"Key Selected", "Index: " + String(index)};
@@ -104,7 +108,8 @@ CommandResponse executeNewKey(String data) {
   global.privateKeys.push_back(privateKeyHex);
   saveKeys();
 
-  Serial.println(COMMAND_NEW_KEY + " 0 ");
+  Serial.print(COMMAND_NEW_KEY);
+  Serial.println(" 0 ");
 
   showMessage("New Key Added", "Total: " + String(global.privateKeys.size()));
   return {"New Key Added", "Total: " + String(global.privateKeys.size())};
@@ -112,7 +117,7 @@ CommandResponse executeNewKey(String data) {
 
 CommandResponse executeNameKey(String data) {
   if (data == "") return {"Error", "No input provided"};
-  
+
   // Get the key index and name
   String indexStr = getTokenAtPosition(data, " ", 0);
 
@@ -148,11 +153,11 @@ CommandResponse executeNameKey(String data) {
 }
 
 void saveActiveKeyIndex() {
-  writeFile(SPIFFS, global.activeKeyIndexFileName.c_str(), String(global.activeKeyIndex));
+  writeFile(SPIFFS, FILE_ACTIVE_KEY_INDEX, String(global.activeKeyIndex));
 }
 
 void loadActiveKeyIndex() {
-  FileData indexFile = readFile(SPIFFS, global.activeKeyIndexFileName.c_str());
+  FileData indexFile = readFile(SPIFFS, FILE_ACTIVE_KEY_INDEX);
   if (indexFile.success) {
     global.activeKeyIndex = indexFile.data.toInt();
     if (global.activeKeyIndex < 0 || global.activeKeyIndex >= global.privateKeys.size()) {

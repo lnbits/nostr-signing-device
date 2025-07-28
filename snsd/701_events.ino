@@ -71,8 +71,8 @@ unsigned long lastDebounceTime1 = 0;
 unsigned long lastDebounceTime2 = 0;
 
 EventData checkButtonsState() {
-  int button1NewState = digitalRead(global.button1Pin);
-  int button2NewState = digitalRead(global.button2Pin);
+  int button1NewState = digitalRead(BTN_1_PIN);
+  int button2NewState = digitalRead(BTN_2_PIN);
   unsigned long currentTime = millis();
 
   if (button1NewState != button1State && (currentTime - lastDebounceTime1) > global.debounceDelay) {

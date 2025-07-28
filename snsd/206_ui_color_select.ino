@@ -30,7 +30,7 @@ void displayColorSelectScreen() {
 
     int totalColors = sizeof(colorOptions) / sizeof(ColorOption);
     int selectedIndex = 0;
-    
+
     // Find current color index
     for (int i = 0; i < totalColors; i++) {
         if (colorOptions[i].value == global.accentColor) {
@@ -50,7 +50,7 @@ void displayColorSelectScreen() {
         tft.setCursor(0, 10);
         tft.println("Select Color:");
         tft.println("");
-        
+
         // Show color name in its own color
         tft.setTextColor(colorOptions[selectedIndex].value, global.backgroundColor);
         tft.println(padRightWithSpaces(colorOptions[selectedIndex].name, 20));
@@ -90,12 +90,12 @@ void displayColorSelectScreen() {
 }
 
 void saveAccentColor() {
-    writeFile(SPIFFS, global.accentColorFileName.c_str(), String(global.accentColor));
+    writeFile(SPIFFS, FILE_ACCENT_COLOR, String(global.accentColor));
 }
 
 void loadAccentColor() {
-    FileData colorFile = readFile(SPIFFS, global.accentColorFileName.c_str());
+    FileData colorFile = readFile(SPIFFS, FILE_ACCENT_COLOR);
     if (colorFile.success) {
         global.accentColor = colorFile.data.toInt();
     }
-} 
+}

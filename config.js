@@ -19,11 +19,4 @@ export const addressesAndFiles = [
 
 export const configPath = "elements.json";
 
-export const elements = [
-  {
-    name: "config_nostr_key",
-    value: "",
-    label: "Nostr private key (nsec)",
-    type: "text",
-  }
-];
+export const elements = [];

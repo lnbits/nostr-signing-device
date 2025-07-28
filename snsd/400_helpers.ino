@@ -42,14 +42,14 @@ void saveKeys() {
   for (String key : global.privateKeys) {
     keysData += key + "\n"; // Each key on a new line
   }
-  writeFile(SPIFFS, global.privateKeysFileName.c_str(), keysData);
+  writeFile(SPIFFS, FILE_PRIVATE_KEYS, keysData);
 
   // Save key names
   String namesData = "";
   for (auto &pair : global.keyNames) {
     namesData += pair.first + "|" + pair.second + "\n"; // Key|Name format
   }
-  writeFile(SPIFFS, global.keyNamesFileName.c_str(), namesData);
+  writeFile(SPIFFS, FILE_KEY_NAMES, namesData);
 }
 
 int countLines(String data, char delimiter = '\n') {
@@ -64,7 +64,7 @@ int countLines(String data, char delimiter = '\n') {
 }
 
 void loadKeys() {
-  FileData keysFile = readFile(SPIFFS, global.privateKeysFileName.c_str());
+  FileData keysFile = readFile(SPIFFS, FILE_PRIVATE_KEYS);
   if (keysFile.success) {
     global.privateKeys.clear(); // Ensure no duplicate keys
     String keysData = keysFile.data;
@@ -82,7 +82,7 @@ void loadKeys() {
   }
 
   // Load key names
-  FileData namesFile = readFile(SPIFFS, global.keyNamesFileName.c_str());
+  FileData namesFile = readFile(SPIFFS, FILE_KEY_NAMES);
   if (namesFile.success) {
     global.keyNames.clear();
     String namesData = namesFile.data;
@@ -213,16 +213,16 @@ bool isValidBech32Key(const String& input, bool isPrivate) {
 
 void migrateKey() {
   logInfo("Migrating private key..");
-  FileData nostrFile = readFile(SPIFFS, global.legacyNostrSecretFileName.c_str());
-  writeFile(SPIFFS, global.privateKeysFileName.c_str(), nostrFile.data + "\n");
-  deleteFile(SPIFFS, global.legacyNostrSecretFileName.c_str());
+  FileData nostrFile = readFile(SPIFFS, FILE_LEGACY_NOSTR_SECRET);
+  writeFile(SPIFFS, FILE_PRIVATE_KEYS, nostrFile.data + "\n");
+  deleteFile(SPIFFS, FILE_LEGACY_NOSTR_SECRET);
   logInfo("Private key migrated.");
   ESP.restart();
 }
 
 void displayToggleDarkMode() {
   global.darkMode = !global.darkMode;
-  
+
   if (global.darkMode) {
     global.foregroundColor = TFT_WHITE;
     global.backgroundColor = TFT_BLACK;
@@ -230,10 +230,10 @@ void displayToggleDarkMode() {
     global.foregroundColor = TFT_BLACK;
     global.backgroundColor = TFT_WHITE;
   }
-  
+
   // Save the dark mode setting
-  writeFile(SPIFFS, global.darkModeFileName.c_str(), global.darkMode ? "1" : "0");
-  
+  writeFile(SPIFFS, FILE_DARKMODE, global.darkMode ? "1" : "0");
+
   // Show confirmation message
   showMessage("Display Mode", global.darkMode ? "Dark Mode" : "Light Mode");
 }

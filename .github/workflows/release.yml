@@ -26,7 +26,7 @@ jobs:
         run: |
           tmp=$(mktemp)
           jq --arg version $tag '.versions |= [$version] + .' versions.json > "$tmp" && mv "$tmp" versions.json
-          // sed -i "/define VERSION/c\#define VERSION \"$tag\"" snsd/100_config.ino
+          sed -i "/define VERSION/c\#define VERSION \"$tag\"" snsd/100_constants.ino
           git config --global user.name 'Alan Bits'
           git config --global user.email 'alan@lnbits.com'
           git commit -am "[CHORE] update version to $tag"
