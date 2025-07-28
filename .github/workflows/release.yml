@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: main
 
@@ -26,6 +26,7 @@ jobs:
         run: |
           tmp=$(mktemp)
           jq --arg version $tag '.versions |= [$version] + .' versions.json > "$tmp" && mv "$tmp" versions.json
+          // sed -i "/define VERSION/c\#define VERSION \"$tag\"" snsd/100_config.ino
           git config --global user.name 'Alan Bits'
           git config --global user.email 'alan@lnbits.com'
           git commit -am "[CHORE] update version to $tag"
@@ -42,12 +43,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
         run: |
-          sh build.sh
+          sh install.sh
+          devices=$(jq '.devices[]' versions.json -r)
+          for device in $devices; do
+              sh build.sh $device
+              mv build/snsd.ino.bin ./build/snsd-$device.ino.bin
+              mv build/snsd.ino.partitions.bin ./build/snsd-$device.ino.partitions.bin
+              mv build/snsd.ino.bootloader.bin ./build/snsd-$device.ino.bootloader.bin
+          done
 
       - name: Create github release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
         run: |
-          gh release create "$tag" --generate-notes ./build/snsd.ino.bootloader.bin \
-            ./build/snsd.ino.bin ./build/snsd.ino.partitions.bin
+          devices=$(jq '.devices[]' versions.json -r)
+          uploads=""
+          for device in $devices; do
+              uploads="$uploads ./build/snsd-$device.ino.bin"
+              uploads="$uploads ./build/snsd-$device.ino.partitions.bin"
+              uploads="$uploads ./build/snsd-$device.ino.bootloader.bin"
+          done
+          gh release create "$tag" --generate-notes $uploads

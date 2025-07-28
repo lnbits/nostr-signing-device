@@ -21,15 +21,9 @@ export const configPath = "elements.json";
 
 export const elements = [
   {
-    name: "config_ssid",
+    name: "config_nostr_key",
     value: "",
-    label: "WiFi SSID",
-    type: "text",
-  },
-  {
-    name: "config_password",
-    value: "",
-    label: "WiFi password",
+    label: "Nostr private key (nsec)",
     type: "text",
   }
 ];

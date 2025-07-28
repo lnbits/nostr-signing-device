@@ -39,26 +39,22 @@ TFT_eSPI tft = TFT_eSPI();
   IMPORTANT: Ensure that SPIFFS partition scheme is used!
 */
 
-// Set BOARD_TYPE to 1 (TTGO T-Display) or 2 (Lilygo T-Display-S3)
-#define BOARD_TYPE 1
-
 // Pin configuration
-#if BOARD_TYPE == 1
+#ifdef TDISPLAY
   // TTGO T-Display
   #define BTN_1_PIN 0
   #define BTN_2_PIN 35
   #define BACKLIGHT_PIN 4
   #define REAL_SCREEN_WIDTH 240
   #define REAL_SCREEN_HEIGHT 135
-#elif BOARD_TYPE == 2
+#endif
+#ifdef TDISPLAY_S3
   // Lilygo T-Display-S3
   #define BTN_1_PIN 0
   #define BTN_2_PIN 14
   #define BACKLIGHT_PIN 38
   #define REAL_SCREEN_WIDTH 320
   #define REAL_SCREEN_HEIGHT 170
-#else
-  #error "Unsupported BOARD_TYPE. Please set BOARD_TYPE to 1 (TTGO T-Display) or 2 (Lilygo T-Display-S3)."
 #endif
 
 // Used for UI scaling (do not amend)
