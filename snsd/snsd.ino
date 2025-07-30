@@ -12,12 +12,12 @@
 #include <Hash.h>
 #include <ArduinoJson.h>
 #include <Bitcoin.h>
-#include <qrcoded.h>
-#include <aes.h>
+#include <QRCodeGenerator.h>
 #include <bootloader_random.h>
 #include <vector>
 #include <gmp-ino.h>
 #include <mbedtls/base64.h>
+#include <mbedtls/aes.h>
 #include <map>
 
 fs::SPIFFSFS &FlashFS = SPIFFS;

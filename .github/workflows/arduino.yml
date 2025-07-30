@@ -28,12 +28,10 @@ jobs:
             - upload.maximum_size=1966080
           libraries: |
             - name: ArduinoJson
-            - name: QRCode
+            - name: QRCodeGenerator
             - name: uBitcoin
-            - name: Base64
             - name: TFT_eSPI
             - name: gmp-ino
-            - source-path: ./libraries/tiny-AES-c
 
       - uses: actions/upload-artifact@v4
         with:

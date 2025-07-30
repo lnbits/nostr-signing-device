@@ -5,4 +5,4 @@ arduino-cli core update-index
 # uBitcoin is broken on esp32 3.x.x
 arduino-cli core install esp32:esp32@2.0.17
 arduino-cli upgrade
-arduino-cli lib install ArduinoJson TFT_eSPI QRcode uBitcoin Base64 gmp-ino
+arduino-cli lib install ArduinoJson TFT_eSPI QRCodeGenerator uBitcoin gmp-ino
