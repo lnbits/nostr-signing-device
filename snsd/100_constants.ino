@@ -1,4 +1,4 @@
-#define VERSION "v1.0.0"
+#define VERSION "v0.3.0"
 
 #define DELAY_MS 5
 #define PAIRING_CONTROL_TEXT "lnbits"
