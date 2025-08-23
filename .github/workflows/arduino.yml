@@ -8,13 +8,6 @@ jobs:
       matrix:
         fqbn:
           - esp32:esp32:ttgo-lora32
-          # - esp32:esp32:esp32s3
-          # - esp32:esp32:esp32c3
-          # future bluetooth chips
-          #- esp32:esp32:esp32c2
-          #- esp32:esp32:esp32c6
-          #- esp32:esp32:esp32h2
-
     steps:
       - uses: actions/checkout@v4
       - uses: arduino/compile-sketches@v1
@@ -33,14 +26,14 @@ jobs:
             - build.partitions=min_spiffs
             - --build-property
             - upload.maximum_size=1966080
+            - --build-property
+            - build.extra_flags.esp32=-DTDISPLAY -DTFT
           libraries: |
             - name: ArduinoJson
+            - name: QRCodeGenerator
             - name: uBitcoin
-            - name: Base64
+            - name: TFT_eSPI
             - name: gmp-ino
-            - source-path: ./libraries/TFT_eSPI
-            - source-path: ./libraries/QRCode
-            - source-path: ./libraries/tiny-AES-c
 
       - uses: actions/upload-artifact@v4
         with:

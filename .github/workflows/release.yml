@@ -16,38 +16,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: main
-
-      - name: update version in repo
-        env:
-          tag: ${{ github.ref_name }}
-        run: |
-          tmp=$(mktemp)
-          jq --arg version $tag '.versions |= [$version] + .' versions.json > "$tmp" && mv "$tmp" versions.json
-          git config --global user.name 'Alan Bits'
-          git config --global user.email 'alan@lnbits.com'
-          git commit -am "[CHORE] update version to $tag"
-          git push
-          git push --delete origin $tag
-          git tag -fa $tag -m "update via workflow"
-          git push --tags
 
       - name: Install Arduino CLI
         uses: arduino/setup-arduino-cli@v1
 
-      - name: build sketch with arduino cli
+      - name: build, release and upload on github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
         run: |
-          sh build.sh
-
-      - name: Create github release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-        run: |
-          gh release create "$tag" --generate-notes ./build/snsd.ino.bootloader.bin \
-            ./build/snsd.ino.bin ./build/snsd.ino.partitions.bin
+          sh install.sh
+          devices=$(jq '.devices[]' versions.json -r)
+          uploads=""
+          for device in $devices; do
+              sh build.sh $device
+              mv build/snsd.ino.bin ./snsd-$device.ino.bin
+              uploads="$uploads ./snsd-$device.ino.bin"
+              mv build/snsd.ino.partitions.bin ./snsd-$device.ino.partitions.bin
+              uploads="$uploads ./snsd-$device.ino.partitions.bin"
+              mv build/snsd.ino.bootloader.bin ./snsd-$device.ino.bootloader.bin
+              uploads="$uploads ./snsd-$device.ino.bootloader.bin"
+          done
+          gh release create "$tag" --generate-notes $uploads

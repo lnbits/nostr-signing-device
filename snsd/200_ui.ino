@@ -25,16 +25,16 @@ void displayLogoScreen() {
   int xOffset = centerX - 15 * scale;
   int yOffset = centerY - 35 * scale;
 
-  tft.fillTriangle(xOffset + 0 * scale, yOffset + 0 * scale, 
-                   xOffset + 30 * scale, yOffset + 0 * scale, 
+  tft.fillTriangle(xOffset + 0 * scale, yOffset + 0 * scale,
+                   xOffset + 30 * scale, yOffset + 0 * scale,
                    xOffset + 0 * scale, yOffset + 40 * scale, TFT_WHITE);
 
-  tft.fillTriangle(xOffset + 10 * scale, yOffset + 25 * scale, 
-                   xOffset + 30 * scale, yOffset + 25 * scale, 
+  tft.fillTriangle(xOffset + 10 * scale, yOffset + 25 * scale,
+                   xOffset + 30 * scale, yOffset + 25 * scale,
                    xOffset + 10 * scale, yOffset + 70 * scale, TFT_WHITE);
 
-  tft.fillTriangle(xOffset + 30 * scale, yOffset + 0 * scale, 
-                   xOffset + 13 * scale, yOffset + 40 * scale, 
+  tft.fillTriangle(xOffset + 30 * scale, yOffset + 0 * scale,
+                   xOffset + 13 * scale, yOffset + 40 * scale,
                    xOffset + 0 * scale, yOffset + 40 * scale, TFT_WHITE);
 
   // Draw rotated "LNbits" text on the left side
@@ -46,7 +46,7 @@ void displayLogoScreen() {
 
   // Draw "LN" in bold by overlaying text slightly offset
   tft.setTextColor(global.foregroundColor);
-  
+
   tft.setCursor(12, 2);
   tft.print("L");
   tft.setCursor(12, 0);
@@ -77,13 +77,13 @@ void displayLogoScreen() {
   tft.setTextSize(1);
 
   // Dynamically calculate bottom-right position
-  int textWidth = tft.textWidth(env.version);
+  int textWidth = tft.textWidth(VERSION);
   int textHeight = 8;
   int textX = REAL_SCREEN_WIDTH - textWidth - 2; // 2-pixel margin
   int textY = REAL_SCREEN_HEIGHT - textHeight - 2; // 2-pixel margin
-  
+
   tft.setCursor(textX, textY);
-  tft.print(env.version);
+  tft.print(VERSION);
 }
 
 void showMessage(String message, String additional)
@@ -108,10 +108,10 @@ void showMessage(String message, String additional)
 void toggleDisplay() {
   if (global.isDisplayOn) {
     tft.writecommand(TFT_DISPOFF);
-    digitalWrite(global.backlightPin, LOW);
+    digitalWrite(BACKLIGHT_PIN, LOW);
   } else {
     tft.writecommand(TFT_DISPON);
-    digitalWrite(global.backlightPin, HIGH);
+    digitalWrite(BACKLIGHT_PIN, HIGH);
   }
 
   global.isDisplayOn = !global.isDisplayOn;
@@ -120,10 +120,10 @@ void toggleDisplay() {
 void setDisplay(bool state) {
   if (!state) {
     tft.writecommand(TFT_DISPOFF);
-    digitalWrite(global.backlightPin, LOW);
+    digitalWrite(BACKLIGHT_PIN, LOW);
   } else {
     tft.writecommand(TFT_DISPON);
-    digitalWrite(global.backlightPin, HIGH);
+    digitalWrite(BACKLIGHT_PIN, HIGH);
   }
 
   global.isDisplayOn = state;
@@ -205,11 +205,11 @@ void displayLoginScreen() {
               showMessage("PIN Accepted", "Access Granted");
               global.unlocked = true;
               global.pinAttempts = 0; // Reset failed attempts on success
-              writeFile(SPIFFS, global.pinAttemptsFileName.c_str(), "0");
+              writeFile(SPIFFS, FILE_PIN_ATTEMPTS, "0");
               return; // Exit the function upon successful PIN entry
             } else {
               global.pinAttempts++;
-              writeFile(SPIFFS, global.pinAttemptsFileName.c_str(), String(global.pinAttempts)); // Log failed attempt
+              writeFile(SPIFFS, FILE_PIN_ATTEMPTS, String(global.pinAttempts)); // Log failed attempt
 
               if (global.pinAttempts >= maxAttempts) {
                 SPIFFS.format(); // Wipe device

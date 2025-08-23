@@ -1,7 +1,7 @@
 #define FORMAT_ON_FAIL true
 
 void loadDarkMode() {
-  FileData darkModeFile = readFile(SPIFFS, global.darkModeFileName.c_str());
+  FileData darkModeFile = readFile(SPIFFS, FILE_DARKMODE);
   if (darkModeFile.success) {
     global.darkMode = (darkModeFile.data == "1");
   } else {
@@ -19,7 +19,10 @@ void loadDarkMode() {
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  Serial.print("Welcome to the LNbits Nostr signing device!");
+  Serial.println(" (" + String(VERSION) + ")");
+
   randomSeed(esp_random());
 
   // Calculate scale factor for UI elements
@@ -42,7 +45,7 @@ void setup() {
   tft.fillScreen(global.backgroundColor);
 
   // Migrate from single key to multi key
-  if(SPIFFS.exists(global.legacyNostrSecretFileName.c_str())) {
+  if(SPIFFS.exists(FILE_LEGACY_NOSTR_SECRET)) {
     migrateKey();
   }
 
@@ -53,9 +56,9 @@ void setup() {
 
   logInfo("NSD: waiting for commands");
 
-  pinMode(global.button1Pin, INPUT_PULLUP);
-  if (global.button1Pin != global.button2Pin) {
-    pinMode(global.button2Pin, INPUT_PULLUP);
+  pinMode(BTN_1_PIN, INPUT_PULLUP);
+  if (BTN_1_PIN != BTN_2_PIN) {
+    pinMode(BTN_2_PIN, INPUT_PULLUP);
   }
 
   // Screen start up sequence

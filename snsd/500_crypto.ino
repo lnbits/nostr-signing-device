@@ -107,16 +107,19 @@ String encryptDirectMessageContent(const String &sharedSecretHex, const String &
     uint8_t messageBin[byteSize];
     data.getBytes(messageBin, byteSize);
 
-    // Encrypt using AES-256-CBC
-    AES_ctx ctx;
-    AES_init_ctx_iv(&ctx, sharedSecret, iv);
-    AES_CBC_encrypt_buffer(&ctx, messageBin, byteSize);
+    byte outputBuffer[byteSize];
+
+    mbedtls_aes_context aes;
+    mbedtls_aes_init(&aes);
+    mbedtls_aes_setkey_enc(&aes, sharedSecret, 256); // AES-256 requires a 32-byte key
+    mbedtls_aes_crypt_cbc(&aes, MBEDTLS_AES_ENCRYPT, byteSize, iv, messageBin, outputBuffer);
+    mbedtls_aes_free(&aes);
 
     // Base64 encode the ciphertext
     size_t base64CiphertextLen = 0;
-    mbedtls_base64_encode(nullptr, 0, &base64CiphertextLen, messageBin, byteSize);
+    mbedtls_base64_encode(nullptr, 0, &base64CiphertextLen, outputBuffer, byteSize);
     char base64Ciphertext[base64CiphertextLen + 1]; // +1 for null terminator
-    mbedtls_base64_encode((unsigned char *)base64Ciphertext, base64CiphertextLen + 1, &base64CiphertextLen, messageBin, byteSize);
+    mbedtls_base64_encode((unsigned char *)base64Ciphertext, base64CiphertextLen + 1, &base64CiphertextLen, outputBuffer, byteSize);
 
     // Base64 encode the IV
     size_t base64IvLen = 0;
@@ -175,13 +178,16 @@ String decryptDirectMessageContent(const String &sharedSecretHex, const String &
     uint8_t sharedSecret[32];
     fromHex(sharedSecretHex, sharedSecret, 32);
 
-    // Decrypt using AES-256-CBC
-    AES_ctx ctx;
-    AES_init_ctx_iv(&ctx, sharedSecret, iv);
-    AES_CBC_decrypt_buffer(&ctx, ciphertext, ciphertextLen);
+    byte outputBuffer[ciphertextLen];
+
+    mbedtls_aes_context aes;
+    mbedtls_aes_init(&aes);
+    mbedtls_aes_setkey_dec(&aes, sharedSecret, 256);
+    mbedtls_aes_crypt_cbc(&aes, MBEDTLS_AES_DECRYPT, ciphertextLen, iv, ciphertext, outputBuffer);
+    mbedtls_aes_free(&aes);
 
     // Remove padding
-    uint8_t paddingLen = ciphertext[ciphertextLen - 1];
+    uint8_t paddingLen = outputBuffer[ciphertextLen - 1];
     if (paddingLen > 16) {
         logInfo("Decryption failed: Invalid padding.");
         return "";
@@ -190,7 +196,7 @@ String decryptDirectMessageContent(const String &sharedSecretHex, const String &
     size_t plaintextLen = ciphertextLen - paddingLen;
 
     // Convert to string and return
-    String decryptedData = String((char *)ciphertext).substring(0, plaintextLen);
+    String decryptedData = String((char *)outputBuffer).substring(0, plaintextLen);
     logInfo("Decrypted Data: " + decryptedData);
 
     // If no prefix is expected, simply return the data
