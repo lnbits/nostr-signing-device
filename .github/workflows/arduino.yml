@@ -26,6 +26,8 @@ jobs:
             - build.partitions=min_spiffs
             - --build-property
             - upload.maximum_size=1966080
+            - --build-property
+            - build.extra_flags.esp32=-DTDISPLAY -DTFT
           libraries: |
             - name: ArduinoJson
             - name: QRCodeGenerator

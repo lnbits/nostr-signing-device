@@ -17,4 +17,4 @@ arduino-cli compile \
     --build-property "upload.maximum_size=1966080" \
     --build-property "build.extra_flags.esp32=-D${device_name}${tft_config}" \
     --build-path build \
-    --fqbn esp32:esp32:ttgo-lora32 snsd
+    --fqbn esp32:esp32:esp32 snsd
