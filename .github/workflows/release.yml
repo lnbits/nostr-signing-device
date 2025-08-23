@@ -20,48 +20,24 @@ jobs:
         with:
           ref: main
 
-      - name: update version in repo
-        env:
-          tag: ${{ github.ref_name }}
-        run: |
-          tmp=$(mktemp)
-          jq --arg version $tag '.versions |= [$version] + .' versions.json > "$tmp" && mv "$tmp" versions.json
-          sed -i "/define VERSION/c\#define VERSION \"$tag\"" snsd/100_constants.ino
-          git config --global user.name 'Alan Bits'
-          git config --global user.email 'alan@lnbits.com'
-          git commit -am "[CHORE] update version to $tag"
-          git push
-          git push --delete origin $tag
-          git tag -fa $tag -m "update via workflow"
-          git push --tags
-
       - name: Install Arduino CLI
         uses: arduino/setup-arduino-cli@v1
 
-      - name: build sketch with arduino cli
+      - name: build, release and upload on github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
         run: |
           sh install.sh
           devices=$(jq '.devices[]' versions.json -r)
-          for device in $devices; do
-              sh build.sh $device
-              mv build/snsd.ino.bin ./build/snsd-$device.ino.bin
-              mv build/snsd.ino.partitions.bin ./build/snsd-$device.ino.partitions.bin
-              mv build/snsd.ino.bootloader.bin ./build/snsd-$device.ino.bootloader.bin
-          done
-
-      - name: Create github release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-        run: |
-          devices=$(jq '.devices[]' versions.json -r)
           uploads=""
           for device in $devices; do
-              uploads="$uploads ./build/snsd-$device.ino.bin"
-              uploads="$uploads ./build/snsd-$device.ino.partitions.bin"
-              uploads="$uploads ./build/snsd-$device.ino.bootloader.bin"
+              sh build.sh $device
+              mv build/snsd.ino.bin ./snsd-$device.ino.bin
+              uploads="$uploads ./snsd-$device.ino.bin"
+              mv build/snsd.ino.partitions.bin ./snsd-$device.ino.partitions.bin
+              uploads="$uploads ./snsd-$device.ino.partitions.bin"
+              mv build/snsd.ino.bootloader.bin ./snsd-$device.ino.bootloader.bin
+              uploads="$uploads ./snsd-$device.ino.bootloader.bin"
           done
           gh release create "$tag" --generate-notes $uploads
