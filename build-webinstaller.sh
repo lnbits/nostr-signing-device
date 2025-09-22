@@ -5,6 +5,9 @@ INSTALLER_REPO=https://github.com/lnbits/hardware-installer
 INSTALLER_PATH=./hardware-installer/public/firmware
 
 git clone $INSTALLER_REPO
+cd hardware-installer
+git checkout before_boot
+cd ..
 
 cp INSTALLER.md ./hardware-installer/public/INSTALLER.md
 cp versions.json ./hardware-installer/src/versions.json
