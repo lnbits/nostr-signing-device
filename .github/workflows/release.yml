@@ -35,14 +35,15 @@ jobs:
           git push --tags
 
       - name: Install Arduino CLI
-        uses: arduino/setup-arduino-cli@v1
+        uses: arduino/setup-arduino-cli@v2
 
       - name: build sketch with arduino cli
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
         run: |
-          sh build.sh
+          sh install.sh
+          sh build.sh tdisplay
 
       - name: Create github release
         env:
