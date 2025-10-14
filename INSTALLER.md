@@ -3,6 +3,7 @@
 This affordable off the shelf Nostr signing device is designed to work with LilyGo's <a href="https://www.aliexpress.com/item/33048962331.html">T-Display</a>, but it will work with any ESP32 microcontroller with some work.
 
 **Flash your device at [nsd.lnbits.com](https://nsd.lnbits.com)**
+**Configure your device at [nsd.lnbits.com/config.html](https://nsd.lnbits.com/config.html)**
 
 ## How to use your NSD
 

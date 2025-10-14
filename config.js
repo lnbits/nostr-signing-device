@@ -19,17 +19,4 @@ export const addressesAndFiles = [
 
 export const configPath = "elements.json";
 
-export const elements = [
-  {
-    name: "config_ssid",
-    value: "",
-    label: "WiFi SSID",
-    type: "text",
-  },
-  {
-    name: "config_password",
-    value: "",
-    label: "WiFi password",
-    type: "text",
-  }
-];
+export const elements = [];

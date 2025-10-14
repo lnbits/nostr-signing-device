@@ -15,6 +15,8 @@ cp config.js ./hardware-installer/src/config.js
 
 sed -i "s/%title%/$PROJECT_NAME/g" ./hardware-installer/index.html
 
+cp ./configure/nsd_config.html ./hardware-installer/config.html
+
 mkdir -p $INSTALLER_PATH
 for device in $(jq -r '.devices[]' ./hardware-installer/src/versions.json); do
     for version in $(jq -r '.versions[]' ./hardware-installer/src/versions.json); do
