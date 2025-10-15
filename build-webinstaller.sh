@@ -15,7 +15,6 @@ cp config.js ./hardware-installer/src/config.js
 
 sed -i "s/%title%/$PROJECT_NAME/g" ./hardware-installer/index.html
 
-cp ./configure/nsd_config.html ./hardware-installer/config.html
 
 mkdir -p $INSTALLER_PATH
 for device in $(jq -r '.devices[]' ./hardware-installer/src/versions.json); do
@@ -29,3 +28,11 @@ for device in $(jq -r '.devices[]' ./hardware-installer/src/versions.json); do
         mv $PROJECT_NAME.ino.bootloader.bin $INSTALLER_PATH/$device/$version
     done
 done
+
+cd ./hardware-installer
+npm install
+npx vite build
+cd ..
+
+# add config page
+cp -r ./configure ./hardware-installer/dist/config
